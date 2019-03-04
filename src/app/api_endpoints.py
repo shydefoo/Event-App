@@ -11,7 +11,7 @@ from .models import *
 logger = EventsAppLogger(__name__).logger
 
 def get_events(request):
-    events = Event.objects.all()
+    events = list(Event.objects.all())
     event_serializer = EventSerializer(Event, events)
     json_string = event_serializer.serialize()
     response = HttpResponse(json_string, content_type="application/json")
@@ -22,6 +22,8 @@ def get_event_photos(request, event_id):
     logger.debug('Get event photos')
     event = get_object_or_404(Event, pk=event_id)
     photos = event.photo_set.all()
+    if len(photos) == 0:
+        return HttpResponse('No Content', status=204)
     url_list = []
     for photo in photos:
         url_list.append(photo.image.url)

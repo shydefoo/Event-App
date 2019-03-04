@@ -4,7 +4,7 @@ from test.requests_test import IntegrationTests
 import requests
 
 class EventsTests(IntegrationTests):
-    event_id = '40507ab0-9b0c-4580-b404-acc09abc9ea6'
+    event_id = '6db48338-8a06-4717-b79f-e705b4da26d1'
     user_id = '8ad8afc4-2870-4264-892a-ac5acb7ddc68'
     def test_get_events(self):
         url = self.base_url + 'get_events/'
