@@ -10,11 +10,12 @@ class UserAccount(models.Model):
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    date = models.DateField(auto_created=True)
+    date = models.DateField(auto_created=True, auto_now_add=True)
     description = models.CharField(max_length=2000)
     title = models.CharField(max_length=200)
-    participants = models.ManyToManyField(UserAccount, related_name='participants')
-    likes = models.ManyToManyField(UserAccount, related_name='likes')
+    location = models.CharField(max_length=20)
+    participants = models.ManyToManyField(UserAccount, related_name='participants', null=True, blank=True)
+    likes = models.ManyToManyField(UserAccount, related_name='likes', null=True, blank=True)
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -24,5 +25,7 @@ class Comment(models.Model):
 
 
 
-
+class Photo(models.Model):
+    image = models.ImageField()
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
