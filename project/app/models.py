@@ -10,7 +10,7 @@ class UserAccount(models.Model):
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    date = models.DateField()
+    date = models.DateField(auto_created=True)
     description = models.CharField(max_length=2000)
     title = models.CharField(max_length=200)
     participants = models.ManyToManyField(UserAccount, related_name='participants')
