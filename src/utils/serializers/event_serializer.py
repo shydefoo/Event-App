@@ -1,3 +1,6 @@
+import jsonpickle
+
+
 class BaseSerializer:
     def __init__(self, model):
         self.model = model
@@ -10,8 +13,10 @@ class EventSerializer(BaseSerializer):
     def __init__(self, model, objects):
         super().__init__(model)
         self.objects = objects
+
     def serialize(self):
-        self.contents = {self.model : []}
+        self.contents = {self.model: []}
         for object in self.objects:
             self.contents[self.model].append(object.__dict__)
-        return self.contents
+        print(self.contents)
+        return jsonpickle.encode(self.contents)
