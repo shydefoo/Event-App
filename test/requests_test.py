@@ -15,12 +15,13 @@ class IntegrationTests(unittest.TestCase):
                 'username': self.username,
                 'password': self.password
             }
-            path = 'auth/login/'
+            path = 'get_jwt_token/'
             url = self.base_url + path
 
             res = requests.post(url, data=data)
             res = res.json()
             token = res['token']
+            print(token)
             header = {
                 'authorization': 'jwt ' + token
             }

@@ -1,4 +1,6 @@
 from django.urls import path
+
+from app.views import test_jwt_validation
 from .api_endpoints import *
 
 urlpatterns = [
@@ -10,4 +12,8 @@ urlpatterns = [
     path('join_event/', join_event),
     path('like_event/', like_event),
     path('comment_event/', comment_on_event)
+]
+
+urlpatterns += [
+    path('auth/testing/', test_jwt_validation)
 ]

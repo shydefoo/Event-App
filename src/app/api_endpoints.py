@@ -15,17 +15,18 @@ logger = EventsAppLogger(__name__).logger
 def get_jwt_token(request):
     key = settings.SECRET_KEY
     algo = settings.HASH_ALGO
-    username = request.POST['user_name']
+    username = request.POST['username']
     pw = request.POST['password']
-    user = get_object_or_404(UserAccount, username=username, pw=pw)
+    user = get_object_or_404(UserAccount, username=username, password=pw)
     payload = {
-        'user_id':user.id,
+        'user_id':user.id.hex,
         'pw':pw
     }
     token = jwt.encode(payload, key, algorithm=algo)
-    return JsonResponse({'jwt': token})
+    logger.debug(token)
+    return JsonResponse({'token': str(token, encoding='utf-8')})
 
-
+@require_http_methods(['GET'])
 @validate_request()
 def get_events(request):
     events = list(Event.objects.all())
@@ -34,7 +35,8 @@ def get_events(request):
     response = HttpResponse(json_string, content_type="application/json")
     return response
 
-
+@require_http_methods(['GET'])
+@validate_request()
 def get_event_photos(request, event_id):
     logger.debug('Get event photos')
     event = get_object_or_404(Event, pk=event_id)
@@ -47,60 +49,54 @@ def get_event_photos(request, event_id):
     response = JsonResponse(url_list, safe=False)
     return response
 
-
+@require_http_methods(['POST'])
+@validate_request()
 def join_event(request):
-    if request.method == 'POST':
-        event_id = request.POST.get('event_id')
-        user_id = request.POST.get('user_id')
-        event = get_object_or_404(Event, pk=event_id)
-        user = get_object_or_404(UserAccount, pk=user_id)
-        event.participants.add(user)
-        logger.info('{} joined event'.format(user))
-        return HttpResponse('Successfully joined event', status=202)
-    else:
-        return HttpResponse('Get method not allowed', status=400)
+    event_id = request.POST.get('event_id')
+    user_id = request.POST.get('user_id')
+    event = get_object_or_404(Event, pk=event_id)
+    user = get_object_or_404(UserAccount, pk=user_id)
+    event.participants.add(user)
+    logger.info('{} joined event'.format(user))
+    return HttpResponse('Successfully joined event', status=202)
 
-
+@require_http_methods(['POST'])
+@validate_request()
 def like_event(request):
-    if request.method == 'POST':
-        event_id = request.POST.get('event_id')
-        user_id = request.POST.get('user_id')
-        event = get_object_or_404(Event, pk=event_id)
-        user = get_object_or_404(UserAccount, pk=user_id)
-        event.likes.add(user)
-        logger.info('{} liked event'.format(user))
-        return HttpResponse('Successfully liked event', status=202)
-    else:
-        return HttpResponse('Get method not allowed', status=400)
+    event_id = request.POST.get('event_id')
+    user_id = request.POST.get('user_id')
+    event = get_object_or_404(Event, pk=event_id)
+    user = get_object_or_404(UserAccount, pk=user_id)
+    event.likes.add(user)
+    logger.info('{} liked event'.format(user))
+    return HttpResponse('Successfully liked event', status=202)
 
-
+@require_http_methods(['POST'])
+@validate_request()
 def comment_on_event(request):
-    if request.method == 'POST':
-        event_id = request.POST.get('event_id')
-        user_id = request.POST.get('user_id')
-        comment = request.POST.get('comment')
-        event = get_object_or_404(Event, pk=event_id)
-        user = get_object_or_404(UserAccount, pk=user_id)
-        comment = Comment(comment=comment, user=user, event=event)
-        comment.save()
-        logger.debug('{} added a comment'.format(user))
-        return HttpResponse('Successfully commented on event', status=202)
-    else:
-        return HttpResponse('Get method not allowed', status=400)
+    event_id = request.POST.get('event_id')
+    user_id = request.POST.get('user_id')
+    comment = request.POST.get('comment')
+    event = get_object_or_404(Event, pk=event_id)
+    user = get_object_or_404(UserAccount, pk=user_id)
+    comment = Comment(comment=comment, user=user, event=event)
+    comment.save()
+    logger.debug('{} added a comment'.format(user))
+    return HttpResponse('Successfully commented on event', status=202)
 
-
+@validate_request()
 def get_event_partitipants(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     participants = event.participants.all()
     json_string = EventParticipantsSerializer(participants).serialize()
     return JsonResponse(json_string, safe=False)
 
-
+@validate_request()
 def get_event_likes(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     likes = event.likes.all()
 
-
+@validate_request()
 def get_event_comments(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     comments = event.comment_set.all()
