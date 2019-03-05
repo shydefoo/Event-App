@@ -70,6 +70,7 @@ class JWTTokenAuthentication(CustomAuthenticationBase):
 
     def authenticate(self):
         user = get_object_or_404(UserAccount, pk=self.user_id)
+        self.user = user
         self.salt = user.salt.salt.hex
         return user.password == self.hash_password(self.pw, self.salt)
 

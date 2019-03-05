@@ -17,12 +17,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+import admin_app.urls
 import app.urls
 from project import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(app.urls))
+    path('api/', include(app.urls)),
+    path('admin_dashboard/', include(admin_app.urls))
 ]
 
 

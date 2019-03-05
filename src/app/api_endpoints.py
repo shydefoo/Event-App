@@ -11,6 +11,9 @@ from .models import *
 
 logger = EventsAppLogger(__name__).logger
 
+def redirect_func() -> HttpResponse:
+    return HttpResponse('Invalid token', status=401)
+
 @require_http_methods(['POST'])
 def get_jwt_token(request):
     key = settings.SECRET_KEY
@@ -21,7 +24,7 @@ def get_jwt_token(request):
     return JsonResponse({'token': str(token, encoding='utf-8')})
 
 @require_http_methods(['GET'])
-@validate_request()
+@validate_request(redirect_func)
 def get_events(request):
     events = list(Event.objects.all())
     event_serializer = EventSerializer(Event, events)
@@ -30,7 +33,7 @@ def get_events(request):
     return response
 
 @require_http_methods(['GET'])
-@validate_request()
+@validate_request(redirect_func)
 def get_event_photos(request, event_id):
     logger.debug('Get event photos')
     event = get_object_or_404(Event, pk=event_id)
@@ -44,7 +47,7 @@ def get_event_photos(request, event_id):
     return response
 
 @require_http_methods(['POST'])
-@validate_request()
+@validate_request(redirect_func)
 def join_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id')
@@ -55,7 +58,7 @@ def join_event(request):
     return HttpResponse('Successfully joined event', status=202)
 
 @require_http_methods(['POST'])
-@validate_request()
+@validate_request(redirect_func)
 def like_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id')
@@ -66,7 +69,7 @@ def like_event(request):
     return HttpResponse('Successfully liked event', status=202)
 
 @require_http_methods(['POST'])
-@validate_request()
+@validate_request(redirect_func)
 def comment_on_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id')
@@ -78,19 +81,23 @@ def comment_on_event(request):
     logger.debug('{} added a comment'.format(user))
     return HttpResponse('Successfully commented on event', status=202)
 
-@validate_request()
+
+@require_http_methods(['GET'])
+@validate_request(redirect_func)
 def get_event_partitipants(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     participants = event.participants.all()
     json_string = EventParticipantsSerializer(participants).serialize()
     return JsonResponse(json_string, safe=False)
 
-@validate_request()
+@require_http_methods(['GET'])
+@validate_request(redirect_func)
 def get_event_likes(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     likes = event.likes.all()
 
-@validate_request()
+@require_http_methods(['GET'])
+@validate_request(redirect_func)
 def get_event_comments(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     comments = event.comment_set.all()
@@ -98,3 +105,5 @@ def get_event_comments(request, event_id):
     comment_serializer = CommentsSerializer(Comment, comments)
     json_string = comment_serializer.serialize()
     return JsonResponse(json_string, safe=False)
+
+
