@@ -14,11 +14,13 @@ def custom_authenticate(username, pw):
 
 
 def hash_password(password, salt):
-
-    # salt = uuid.uuid4().hex
     hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
     return hashed_password
 
+def generate_new_password(password):
+    salt = uuid.uuid4().hex
+    hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
+    return hashed_password, salt
 
 def print_password(password):
     salt = uuid.uuid4().hex
