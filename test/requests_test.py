@@ -38,7 +38,8 @@ class IntegrationTests(unittest.TestCase):
 
     def test_request_without_token(self):
         url = self.base_url + 'auth/testing/'
-        res2 = requests.post(url)
+        res2 = requests.get(url)
+        print(res2.json())
         reply = {
             'detail': 'Authentication credentials were not provided.'
         }

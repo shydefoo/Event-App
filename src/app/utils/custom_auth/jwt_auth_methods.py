@@ -1,11 +1,10 @@
 from functools import wraps
-import jwt
-from django.contrib.auth.hashers import make_password
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404
 
-from app.models import UserAccount, UserSaltTable
-from app.utils.custom_auth.password_handler import hash_password, custom_authenticate
+import jwt
+from django.http import HttpResponse, JsonResponse
+
+from app.utils.custom_auth.password_handler import JWTTokenAuthentication, \
+    BasicCustomAuthentication
 from project import settings
 from project.settings import HASH_ALGO
 from utils.logger_class import EventsAppLogger
@@ -26,9 +25,11 @@ def validate_request():
                     user_id = decoded['user_id']
                     pw = decoded['pw'] # raw or hashed password?
 
-                    user = get_object_or_404(UserAccount, pk=user_id)
-                    salt = user.salt.salt.hex
-                    if user.password == hash_password(pw, salt):
+                    # user = get_object_or_404(UserAccount, pk=user_id)
+                    # salt = user.salt.salt.hex
+                    # if user.password == hash_password(pw, salt):
+                    auth_handler = JWTTokenAuthentication(pw, user_id)
+                    if auth_handler.authenticate():
                         logger.debug('True')
                         return func(request, *args, **kwargs)
                     else:
@@ -43,12 +44,15 @@ def validate_request():
     return decorator
 
 def generate_token(username, pw):
-    user = custom_authenticate(username, pw)
-    payload = {
-        'user_id':user.id.hex,
-        'pw': pw
-    }
-    token = jwt.encode(payload, key, algorithm=HASH_ALGO)
-    logger.debug(token)
-    return token
-
+    auth_handler = BasicCustomAuthentication(pw, username)
+    user = auth_handler.authenticate()
+    if user is not None:
+        payload = {
+            'user_id':user.id.hex,
+            'pw': pw
+        }
+        token = jwt.encode(payload, key, algorithm=HASH_ALGO)
+        logger.debug(token)
+        return token
+    else:
+        return 'Incorrect credentials'
