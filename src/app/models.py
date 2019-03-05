@@ -1,16 +1,42 @@
 import uuid
-
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 
 # Create your models here.
+class UserSaltTable(models.Model):
+    salt = models.UUIDField(default=uuid.uuid4())
+
+
 class UserAccount(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    username = models.CharField(max_length=50)
-    password = models.CharField(max_length=16)
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=True,
+        help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+    )
+    password = models.CharField(_('password'), max_length=128)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+    salt = models.OneToOneField(UserSaltTable, on_delete=models.CASCADE)
+
+
+# class AdminUserAccount(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+#     username = models.CharField(max_length=50)
+#     password = models.CharField(max_length=128)
+
 
 class Category(models.Model):
-    category = models.CharField(max_length=200)
+    category = models.CharField(max_length=50)
+
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -21,7 +47,6 @@ class Event(models.Model):
     location = models.CharField(max_length=20)
     participants = models.ManyToManyField(UserAccount, related_name='participants', null=True, blank=True)
     likes = models.ManyToManyField(UserAccount, related_name='likes', null=True, blank=True)
-
 
 
 class Comment(models.Model):

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Event, Photo, UserAccount, Comment
+from .models import Event, Photo, UserAccount, Comment, UserSaltTable
 
 
 @admin.register(Event)
@@ -19,4 +19,8 @@ class UserAccountAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(UserSaltTable)
+class UserSaltTable(admin.ModelAdmin):
     pass

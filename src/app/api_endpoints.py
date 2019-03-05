@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 
-from app.utils.custom_auth.jwt_auth_methods import validate_request
+from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
 from project import settings
 from utils.logger_class import EventsAppLogger
 from app.utils.serializers.serializer_classes import EventSerializer, EventParticipantsSerializer, CommentsSerializer
@@ -17,13 +17,7 @@ def get_jwt_token(request):
     algo = settings.HASH_ALGO
     username = request.POST['username']
     pw = request.POST['password']
-    user = get_object_or_404(UserAccount, username=username, password=pw)
-    payload = {
-        'user_id':user.id.hex,
-        'pw':pw
-    }
-    token = jwt.encode(payload, key, algorithm=algo)
-    logger.debug(token)
+    token = generate_token(username, pw)
     return JsonResponse({'token': str(token, encoding='utf-8')})
 
 @require_http_methods(['GET'])

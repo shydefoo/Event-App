@@ -1,14 +1,17 @@
 from functools import wraps
 import jwt
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
-from app.models import UserAccount
+from app.models import UserAccount, UserSaltTable
+from app.utils.custom_auth.password_handler import hash_password, custom_authenticate
 from project import settings
 from project.settings import HASH_ALGO
 from utils.logger_class import EventsAppLogger
 
 key = settings.SECRET_KEY
+
 logger = EventsAppLogger(__name__).logger
 
 def validate_request():
@@ -21,9 +24,10 @@ def validate_request():
                 try:
                     decoded = jwt.decode(jwt_token, key, algorithm=HASH_ALGO)
                     user_id = decoded['user_id']
-                    pw = decoded['pw']
+                    pw = decoded['pw'] # raw or hashed password?
                     user = get_object_or_404(UserAccount, pk=user_id)
-                    if user.password == pw:
+                    salt = user.salt.salt.hex
+                    if user.password == hash_password(pw, salt):
                         logger.debug('True')
                         return func(request, *args, **kwargs)
                     else:
@@ -37,5 +41,13 @@ def validate_request():
         return inner
     return decorator
 
-
+def generate_token(username, pw):
+    user = custom_authenticate(username, pw)
+    payload = {
+        'user_id':user.id.hex,
+        'pw': user.password
+    }
+    token = jwt.encode(payload, key, algorithm=HASH_ALGO)
+    logger.debug(token)
+    return token
 
