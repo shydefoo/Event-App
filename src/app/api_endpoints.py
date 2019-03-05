@@ -5,10 +5,11 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from utils.logger_class import EventsAppLogger
-from utils.serializers.event_serializer import EventSerializer, EventParticipantsSerializer
+from utils.serializers.serializer_classes import EventSerializer, EventParticipantsSerializer, CommentsSerializer
 from .models import *
 
 logger = EventsAppLogger(__name__).logger
+
 
 def get_events(request):
     events = list(Event.objects.all())
@@ -30,6 +31,7 @@ def get_event_photos(request, event_id):
     response = JsonResponse(url_list, safe=False)
     return response
 
+
 def join_event(request):
     if request.method == 'POST':
         event_id = request.POST.get('event_id')
@@ -41,7 +43,6 @@ def join_event(request):
         return HttpResponse('Successfully joined event', status=202)
     else:
         return HttpResponse('Get method not allowed', status=400)
-
 
 
 def like_event(request):
@@ -56,6 +57,7 @@ def like_event(request):
     else:
         return HttpResponse('Get method not allowed', status=400)
 
+
 def comment_on_event(request):
     if request.method == 'POST':
         event_id = request.POST.get('event_id')
@@ -65,6 +67,7 @@ def comment_on_event(request):
         user = get_object_or_404(UserAccount, pk=user_id)
         comment = Comment(comment=comment, user=user, event=event)
         comment.save()
+        logger.debug('{} added a comment'.format(user))
         return HttpResponse('Successfully commented on event', status=202)
     else:
         return HttpResponse('Get method not allowed', status=400)
@@ -76,6 +79,16 @@ def get_event_partitipants(request, event_id):
     json_string = EventParticipantsSerializer(participants).serialize()
     return JsonResponse(json_string, safe=False)
 
+
 def get_event_likes(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     likes = event.likes.all()
+
+
+def get_event_comments(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    comments = event.comment_set.all()
+    logger.debug(comments)
+    comment_serializer = CommentsSerializer(Comment, comments)
+    json_string = comment_serializer.serialize()
+    return JsonResponse(json_string, safe=False)

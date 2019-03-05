@@ -90,4 +90,5 @@ db.sqlite3
 .idea
 *.jpg
 *.png
+/Images/
 /src/static

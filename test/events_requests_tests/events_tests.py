@@ -4,8 +4,8 @@ from test.requests_test import IntegrationTests
 import requests
 
 class EventsTests(IntegrationTests):
-    event_id = '6db48338-8a06-4717-b79f-e705b4da26d1'
-    user_id = '8ad8afc4-2870-4264-892a-ac5acb7ddc68'
+    event_id = '6dbe4ec4-7caa-4b9a-aeef-41ad67a963c7'
+    user_id = 'ccd4e975-9608-412c-acf2-5150caaef1b3'
     def test_get_events(self):
         url = self.base_url + 'get_events/'
         # header = self.build_header()
@@ -44,7 +44,7 @@ class EventsTests(IntegrationTests):
         pprint.pprint(res.text)
 
     def test_comment_on_event(self):
-        url = self.base_url + 'like_event/'
+        url = self.base_url + 'comment_event/'
         # header = self.build_header()
         header = {}
         data = {
@@ -54,3 +54,10 @@ class EventsTests(IntegrationTests):
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.text)
+
+    def test_get_event_comments(self):
+        url = self.base_url + 'get_event_comments/{}'.format(self.event_id)
+        # header = self.build_header()
+        header = {}
+        res = requests.get(url, headers=header)
+        pprint.pprint(res.json())
