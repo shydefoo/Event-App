@@ -21,6 +21,8 @@ def validator_view(request):
     user = request.user
     if user.is_staff:
         return HttpResponseRedirect('/home/')
+    else:
+        return HttpResponseRedirect('/login/')
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
@@ -38,3 +40,7 @@ def login(request):
                 return HttpResponseRedirect('/home/')
             else:
                 pass
+
+@validate_request(direct_login_page)
+def home(request):
+    pass

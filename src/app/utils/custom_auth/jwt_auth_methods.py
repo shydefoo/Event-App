@@ -15,7 +15,7 @@ key = settings.SECRET_KEY
 logger = EventsAppLogger(__name__).logger
 
 
-def validate_request(redirect_func: callable) -> Response:
+def validate_request(redirect_func: callable):
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
