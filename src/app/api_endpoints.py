@@ -1,16 +1,32 @@
-import json
-
-import jsonpickle
+import jwt
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_http_methods
 
+from app.utils.custom_auth.jwt_auth_methods import validate_request
+from project import settings
 from utils.logger_class import EventsAppLogger
-from utils.serializers.serializer_classes import EventSerializer, EventParticipantsSerializer, CommentsSerializer
+from app.utils.serializers.serializer_classes import EventSerializer, EventParticipantsSerializer, CommentsSerializer
 from .models import *
 
 logger = EventsAppLogger(__name__).logger
 
+@require_http_methods(['POST'])
+def get_jwt_token(request):
+    key = settings.SECRET_KEY
+    algo = settings.HASH_ALGO
+    username = request.POST['user_name']
+    pw = request.POST['password']
+    user = get_object_or_404(UserAccount, username=username, pw=pw)
+    payload = {
+        'user_id':user.id,
+        'pw':pw
+    }
+    token = jwt.encode(payload, key, algorithm=algo)
+    return JsonResponse({'jwt': token})
 
+
+@validate_request()
 def get_events(request):
     events = list(Event.objects.all())
     event_serializer = EventSerializer(Event, events)

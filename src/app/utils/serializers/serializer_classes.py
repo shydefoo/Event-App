@@ -1,7 +1,7 @@
 import jsonpickle
 
 from utils.logger_class import EventsAppLogger
-from utils.serializers.serializer_response_classes import SingleEvent, SingleComment
+from app.utils.serializers.serializer_response_classes import SingleEvent, SingleComment
 
 logger = EventsAppLogger(__name__).logger
 
