@@ -25,6 +25,7 @@ def validate_request():
                     decoded = jwt.decode(jwt_token, key, algorithm=HASH_ALGO)
                     user_id = decoded['user_id']
                     pw = decoded['pw'] # raw or hashed password?
+
                     user = get_object_or_404(UserAccount, pk=user_id)
                     salt = user.salt.salt.hex
                     if user.password == hash_password(pw, salt):
@@ -32,7 +33,7 @@ def validate_request():
                         return func(request, *args, **kwargs)
                     else:
                         logger.debug('False')
-                        return HttpResponse('Invalid token')
+                        return HttpResponse('Invalid token', status=401)
                 except Exception as e:
                     logger.error(str(e))
                     return HttpResponse('Error processing token', status=401)
@@ -45,7 +46,7 @@ def generate_token(username, pw):
     user = custom_authenticate(username, pw)
     payload = {
         'user_id':user.id.hex,
-        'pw': user.password
+        'pw': pw
     }
     token = jwt.encode(payload, key, algorithm=HASH_ALGO)
     logger.debug(token)
