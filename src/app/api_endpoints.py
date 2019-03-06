@@ -11,7 +11,7 @@ from .models import *
 
 logger = EventsAppLogger(__name__).logger
 
-def redirect_func() -> HttpResponse:
+def redirect_func(request, *arsg, **kwargs) -> HttpResponse:
     return HttpResponse('Invalid token', status=401)
 
 @require_http_methods(['POST'])

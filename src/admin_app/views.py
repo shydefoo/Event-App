@@ -12,18 +12,22 @@ from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
 
-def direct_login_page():
-    return HttpResponseRedirect('/login/')
-
+def direct_login_page(request, *args, **kwargs):
+    logger.debug('redirect login page')
+    return HttpResponseRedirect(reverse('login'))
+    # return HttpResponse('Error Logging in', status=401)
 
 @require_http_methods(['GET'])
 @validate_request(direct_login_page)
 def validator_view(request):
     user = request.user
+    logger.debug(user.__dict__)
     if user.is_staff:
-        return HttpResponseRedirect('/home/')
+        logger.debug('user is_staff')
+        return HttpResponseRedirect(reverse('home'))
     else:
-        return HttpResponseRedirect('/login/')
+        logger.debug('non staff')
+        return HttpResponseRedirect(reverse('login'))
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
@@ -43,7 +47,7 @@ def login(request):
             auth_handler = BasicCustomAuthentication(pw, username)
             if auth_handler.authenticate():
                 logger.debug('Authentication success')
-                return HttpResponseRedirect('/home/')
+                return HttpResponseRedirect(reverse('validator_view'))
             else:
                 logger.debug('Authentication failed')
                 pass
@@ -53,4 +57,5 @@ def login(request):
 
 @validate_request(direct_login_page)
 def home(request):
+    logger.debug('home view')
     return HttpResponse('Login success')

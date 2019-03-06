@@ -16,6 +16,7 @@ logger = EventsAppLogger(__name__).logger
 
 
 def validate_request(redirect_func: callable):
+    logger.debug('validate requests')
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
@@ -39,13 +40,15 @@ def validate_request(redirect_func: callable):
                         logger.debug('False')
                         # return HttpResponse('Invalid token', status=401)
                         # function to redirect
-                        return redirect_func
+                        # return redirect_func
+                        return redirect_func(request, *args, **kwargs)
                 except Exception as e:
                     logger.error(str(e))
                     return HttpResponse('Error processing token', status=401)
             else:
                 # return JsonResponse({'detail': 'Authentication credentials were not provided'}, status=401)
-                return redirect_func
+                # return redirect_func
+                return redirect_func(request, *args, **kwargs)
         return inner
 
     return decorator
