@@ -11,7 +11,8 @@ class LoginForm(forms.Form):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['datetime_of_event', 'description', 'category','title', 'location']
+        fields = ['title', 'datetime_of_event', 'description', 'category', 'location']
         widgets = {
             'datetime_of_event' : forms.DateInput(attrs={'class':'datetime-input'}),
         }
+

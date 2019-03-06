@@ -10,7 +10,7 @@ from admin_app.utils.cookies_handler import set_cookie
 from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_request
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
-from app.utils.serializers.serializer_response_classes import SingleEvent
+from app.utils.serializers.serializer_response_classes import SingleEvent, SingleEventForm
 from project.settings import JWT_COOKIE
 from utils.logger_class import EventsAppLogger
 
@@ -83,7 +83,7 @@ def event_view(request, event_id):
     if request.method == 'GET':
         # render form with data
         event = get_object_or_404(Event, pk=event_id)
-        single_event = SingleEvent(event)
+        single_event = SingleEventForm(event)
         event_form = EventForm(initial=single_event.__dict__)
         context = {'form': event_form, 'event_id':event_id}
         return render(request, 'admin_app/event_view.html', context=context)

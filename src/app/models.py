@@ -39,6 +39,8 @@ class UserAccount(models.Model):
 class Category(models.Model):
     category = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.category
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)

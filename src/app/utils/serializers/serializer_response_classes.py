@@ -28,3 +28,11 @@ class SingleComment(BaseSingleEntity):
         self.comment = comment.comment
         self.id = comment.id.hex
         self.user = self.extract_id(comment.user)
+
+
+class SingleEventForm(SingleEvent):
+    def __init__(self, event):
+        super().__init__(event)
+
+    def extract_category(self, category):
+        return category.id

@@ -1,7 +1,9 @@
 {% extends 'admin_app/base.html' %}
 {% block content %}
 <form action="{% url 'event_view' event_id=event_id %}" method="post">
-    {{ form }}
+    {% for field in form %}
+    {{field.label}}: {{field}}<br>
+    {% endfor %}
     <input type="submit" value="Submit">
 </form>
 {% endblock content %}
