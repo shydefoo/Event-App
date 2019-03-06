@@ -65,12 +65,10 @@ def login(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             pw = form.cleaned_data['password']
-            logger.debug('username: {}, pw: {}'.format(username, pw))
             auth_handler = BasicStaffCustomAuthentication(pw, username)
             if auth_handler.authenticate():
                 logger.debug('Authentication success')
                 response = HttpResponseRedirect(reverse('home'))
-                logger.debug('token: {}'.format(auth_handler.token))
                 set_cookie(response, JWT_COOKIE, auth_handler.token, None)
                 return response
             else:
@@ -138,27 +136,32 @@ def event_view(request, event_id):
 @validate_staff_status(direct_login_page)
 def create_event_view(request):
     if request.method == 'GET':
+        event_form = EventForm()
         context = {
-            'form': EventForm
+            'form': event_form,
         }
         return render(request, 'admin_app/create_event_view.html', context=context)
     if request.method == 'POST':
-        event = EventForm(request.POST)
-        event.save()
-        return HttpResponseRedirect(reverse('home'))
-
-def photo_upload(request, event_id):
-    if request.method == 'POST':
-        photo_form = PhotoForm(request.POST, request.FILES)
-        if photo_form.is_valid():
-            photo_form.save()
-            instance = photo_form.instance
-            instance.event = get_object_or_404(Event, pk=event_id)
-            instance.save()
+        event_form = EventForm(request.POST)
+        if event_form.is_valid():
+            event_form.save()
             return HttpResponseRedirect(reverse('home'))
         else:
-            logger.error(photo_form.errors)
+            logger.debug(event_form.errors)
             return HttpResponse('error')
+
+# def photo_upload(request, event_id):
+#     if request.method == 'POST':
+#         photo_form = PhotoForm(request.POST, request.FILES)
+#         if photo_form.is_valid():
+#             photo_form.save()
+#             instance = photo_form.instance
+#             instance.event = get_object_or_404(Event, pk=event_id)
+#             instance.save()
+#             return HttpResponseRedirect(reverse('home'))
+#         else:
+#             logger.error(photo_form.errors)
+#             return HttpResponse('error')
 
 # def create_event_view(request):
 #     photo_formset = modelformset_factory(Photo, form=PhotoForm, extra=3)

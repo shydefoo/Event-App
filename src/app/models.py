@@ -69,7 +69,7 @@ class Comment(models.Model):
 
 
 class Photo(models.Model):
-    image = models.ImageField()
+    image = models.ImageField(blank=True)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
 
     def __str__(self):

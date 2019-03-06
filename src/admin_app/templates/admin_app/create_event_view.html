@@ -1,8 +1,7 @@
 {% extends 'admin_app/base.html' %}
 {% block content %}
 <form action="{% url 'create_event'%}" method="post" enctype="multipart/form-data">
-    {{ form }}
-    {{ photo_form.as_p}}
+    {{ form.as_p}}
     <input type="submit" value="Submit">
 </form>
 {% endblock %}
