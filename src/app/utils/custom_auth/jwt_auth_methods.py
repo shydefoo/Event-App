@@ -44,8 +44,8 @@ def validate_request(redirect_func: callable):
                     logger.error(str(e))
                     return HttpResponse('Error processing token', status=401)
             else:
-                return JsonResponse({'detail': 'Authentication credentials were not provided'}, status=401)
-
+                # return JsonResponse({'detail': 'Authentication credentials were not provided'}, status=401)
+                return redirect_func
         return inner
 
     return decorator

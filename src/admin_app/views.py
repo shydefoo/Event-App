@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
@@ -28,7 +28,9 @@ def validator_view(request):
 def login(request):
     if request.method == 'GET':
         # render login page
-        pass
+        context = {'form': LoginForm}
+        return render(request, 'admin_app/login.html', context=context)
+
     elif request.method =='POST':
         # process login details
         form = LoginForm(request.POST)
@@ -43,4 +45,4 @@ def login(request):
 
 @validate_request(direct_login_page)
 def home(request):
-    pass
+    return HttpResponse('Login success')
