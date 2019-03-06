@@ -1,18 +1,21 @@
 {% extends 'admin_app/base.html' %}
 {% block content %}
-<form action="{% url 'event_view' event_id=event_id %}" method="post">
+<form action="{% url 'event_view' event_id=event_id %}" method="post" enctype="multipart/form-data">
     {{form.as_p}}
     {{ photo_form.as_p }}
     <input type="submit" value="Submit">
 </form>
-<form action="{% url 'photo_upload' event_id=event_id %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <button type="submit">Upload</button>
-</form>
-
-
 {% endblock content %}
+
+{% block cards %}
+{% for image in images %}
+    <li>
+        <img src="{{ image.image.url }}" alt="Image" width="150" height="150"/>
+    </li>
+{% endfor %}
+
+{% endblock cards %}
+
 {% block javascript %}
 <script>
     $(function () {
