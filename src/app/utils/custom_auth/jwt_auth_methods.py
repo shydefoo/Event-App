@@ -1,7 +1,8 @@
 from functools import wraps
 
 import jwt
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.urls import reverse
 from requests import Response
 
 from app.utils.custom_auth.password_handler import JWTTokenAuthentication, \
@@ -55,6 +56,20 @@ def validate_request(redirect_func: callable):
 
     return decorator
 
+def validate_staff_status(redirect_func):
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            user = request.user
+            # logger.debug(user.__dict__)
+            if user.is_staff:
+                logger.debug('user is_staff')
+                return func(request, *args, **kwargs)
+            else:
+                logger.debug('non staff')
+                return redirect_func(request, *args, **kwargs)
+        return inner
+    return decorator
 
 def generate_token(username, pw):
     auth_handler = BasicCustomAuthentication(pw, username)

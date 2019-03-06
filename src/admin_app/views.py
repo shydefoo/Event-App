@@ -8,8 +8,8 @@ from django.views.decorators.http import require_http_methods
 from admin_app.forms import LoginForm, EventForm
 from admin_app.utils.cookies_handler import set_cookie
 from app.models import Event
-from app.utils.custom_auth.jwt_auth_methods import validate_request
-from app.utils.custom_auth.password_handler import BasicCustomAuthentication
+from app.utils.custom_auth.jwt_auth_methods import validate_request, validate_staff_status
+from app.utils.custom_auth.password_handler import BasicCustomAuthentication, BasicStaffCustomAuthentication
 from app.utils.serializers.serializer_response_classes import SingleEvent, SingleEventForm
 from project.settings import JWT_COOKIE
 from utils.logger_class import EventsAppLogger
@@ -17,6 +17,13 @@ from utils.logger_class import EventsAppLogger
 logger = EventsAppLogger(__name__).logger
 
 def direct_login_page(request, *args, **kwargs):
+    '''
+    performs redirection to login page
+    :param request:
+    :param args:
+    :param kwargs:
+    :return:
+    '''
     logger.debug('redirect login page')
     return HttpResponseRedirect(reverse('login'))
     # return HttpResponse('Error Logging in', status=401)
@@ -24,6 +31,11 @@ def direct_login_page(request, *args, **kwargs):
 @require_http_methods(['GET'])
 @validate_request(direct_login_page)
 def validator_view(request):
+    '''
+    Checks if user that signs in has staff status or not
+    :param request:
+    :return:
+    '''
     user = request.user
     logger.debug(user.__dict__)
     if user.is_staff:
@@ -35,6 +47,11 @@ def validator_view(request):
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
+    '''
+    Login page
+    :param request:
+    :return:
+    '''
     if request.method == 'GET':
         # render login page
         context = {'form': LoginForm}
@@ -48,7 +65,7 @@ def login(request):
             username = form.cleaned_data['username']
             pw = form.cleaned_data['password']
             logger.debug('username: {}, pw: {}'.format(username, pw))
-            auth_handler = BasicCustomAuthentication(pw, username)
+            auth_handler = BasicStaffCustomAuthentication(pw, username)
             if auth_handler.authenticate():
                 logger.debug('Authentication success')
                 response = HttpResponseRedirect(reverse('home'))
@@ -57,12 +74,13 @@ def login(request):
                 return response
             else:
                 logger.debug('Authentication failed')
-                pass
+                return direct_login_page(request)
         else:
             logger.debug('Invalid form')
-            return HttpResponseRedirect(reverse('login'))
+            return direct_login_page(request)
 
 @validate_request(direct_login_page)
+@validate_staff_status(direct_login_page)
 def home(request):
     '''
     Shows list of events
@@ -79,6 +97,7 @@ def home(request):
 
 
 @require_http_methods(['GET', 'POST'])
+@validate_staff_status(direct_login_page)
 def event_view(request, event_id):
     if request.method == 'GET':
         # render form with data
@@ -94,6 +113,7 @@ def event_view(request, event_id):
         return HttpResponseRedirect(reverse('home'))
 
 @require_http_methods(['GET', 'POST'])
+@validate_staff_status(direct_login_page)
 def create_event_view(request):
     if request.method == 'GET':
         context = {

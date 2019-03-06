@@ -57,6 +57,17 @@ class BasicCustomAuthentication(CustomAuthenticationBase):
         hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
         return hashed_password, salt
 
+class BasicStaffCustomAuthentication(BasicCustomAuthentication):
+    def authenticate(self):
+        user = get_object_or_404(UserAccount, username=self.username)
+        self.salt = user.salt.salt.hex
+        hashed_pw = self.hash_password(self.pw, self.salt)
+        if hashed_pw == user.password and user.is_staff:
+            self.user = user
+            self.generate_token()
+            return user
+        else:
+            return None
 
 class JWTTokenAuthentication(CustomAuthenticationBase):
     def __init__(self, pw, user_id):
