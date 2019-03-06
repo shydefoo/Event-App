@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from admin_app.forms import LoginForm
@@ -34,14 +35,21 @@ def login(request):
     elif request.method =='POST':
         # process login details
         form = LoginForm(request.POST)
+        logger.debug(form.errors)
         if form.is_valid():
             username = form.cleaned_data['username']
             pw = form.cleaned_data['password']
+            logger.debug('username: {}, pw: {}'.format(username, pw))
             auth_handler = BasicCustomAuthentication(pw, username)
             if auth_handler.authenticate():
+                logger.debug('Authentication success')
                 return HttpResponseRedirect('/home/')
             else:
+                logger.debug('Authentication failed')
                 pass
+        else:
+            logger.debug('Invalid form')
+            return HttpResponseRedirect(reverse('login'))
 
 @validate_request(direct_login_page)
 def home(request):
