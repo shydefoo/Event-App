@@ -1,11 +1,16 @@
 {% extends 'admin_app/base.html' %}
 {% block content %}
 <form action="{% url 'event_view' event_id=event_id %}" method="post">
-    {% for field in form %}
-    {{field.label}}: {{field}}<br>
-    {% endfor %}
+    {{form.as_p}}
     <input type="submit" value="Submit">
 </form>
+<form action="{% url 'photo_upload' event_id=event_id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ photo_form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+
+
 {% endblock content %}
 {% block javascript %}
 <script>

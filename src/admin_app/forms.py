@@ -1,6 +1,6 @@
 from django import forms
 
-from app.models import UserAccount, Event
+from app.models import UserAccount, Event, Photo
 
 
 class LoginForm(forms.Form):
@@ -9,6 +9,7 @@ class LoginForm(forms.Form):
 
 
 class EventForm(forms.ModelForm):
+
     class Meta:
         model = Event
         fields = ['title', 'datetime_of_event', 'description', 'category', 'location']
@@ -16,3 +17,9 @@ class EventForm(forms.ModelForm):
             'datetime_of_event' : forms.DateInput(attrs={'class':'datetime-input'}),
         }
 
+
+
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['image']

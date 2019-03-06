@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from admin_app.forms import LoginForm, EventForm
+from admin_app.forms import LoginForm, EventForm, PhotoForm
 from admin_app.utils.cookies_handler import set_cookie
 from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_request, validate_staff_status
@@ -104,7 +104,10 @@ def event_view(request, event_id):
         event = get_object_or_404(Event, pk=event_id)
         single_event = SingleEventForm(event)
         event_form = EventForm(initial=single_event.__dict__)
-        context = {'form': event_form, 'event_id':event_id}
+        photo_form = PhotoForm()
+        context = {'event_id':event_id,
+                   'form': event_form,
+                   'photo_form': photo_form}
         return render(request, 'admin_app/event_view.html', context=context)
     if request.method == 'POST':
         event = get_object_or_404(Event, pk=event_id)
@@ -124,3 +127,18 @@ def create_event_view(request):
         event = EventForm(request.POST)
         event.save()
         return HttpResponseRedirect(reverse('home'))
+
+def photo_upload(request, event_id):
+    if request.method == 'POST':
+        photo_form = PhotoForm(request.POST, request.FILES)
+        if photo_form.is_valid():
+            photo_form.save()
+            instance = photo_form.instance
+            instance.event = get_object_or_404(Event, pk=event_id)
+            instance.save()
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            logger.error(photo_form.errors)
+            return HttpResponse('error')
+
+

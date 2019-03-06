@@ -56,6 +56,9 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('event_view', kwargs={'event_id': self.id})
 
+    def __str__(self):
+        return self.title
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -67,4 +70,7 @@ class Comment(models.Model):
 
 class Photo(models.Model):
     image = models.ImageField()
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.image.name
