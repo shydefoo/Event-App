@@ -1,10 +1,24 @@
 {% extends 'admin_app/base.html' %}
 {% block content %}
-<form action="{% url 'create_event'%}" method="post">
-    {{ form }}
-    <input type="submit" value="Submit">
+<form id="post_form" method="post" action="{% url 'create_event' %}" enctype="multipart/form-data">
+
+    {% for hidden in event_form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+
+    {% for field in event_form %}
+        {{field.label}}: {{ field }} <br />
+    {% endfor %}
+
+    {{ photo_form.management_form }}
+    {% for form in photo_form %}
+        {{ form }}
+    {% endfor %}
+
+
+    <input type="submit" name="submit" value="Submit" />
 </form>
-{% endblock content %}
+{% endblock %}
 {% block javascript %}
 <script>
     $(function () {

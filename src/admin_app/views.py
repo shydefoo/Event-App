@@ -1,3 +1,4 @@
+from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 
@@ -7,7 +8,7 @@ from django.views.decorators.http import require_http_methods
 
 from admin_app.forms import LoginForm, EventForm, PhotoForm
 from admin_app.utils.cookies_handler import set_cookie
-from app.models import Event
+from app.models import Event, Photo
 from app.utils.custom_auth.jwt_auth_methods import validate_request, validate_staff_status
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication, BasicStaffCustomAuthentication
 from app.utils.serializers.serializer_response_classes import SingleEvent, SingleEventForm
@@ -115,18 +116,18 @@ def event_view(request, event_id):
         f.save()
         return HttpResponseRedirect(reverse('home'))
 
-@require_http_methods(['GET', 'POST'])
-@validate_staff_status(direct_login_page)
-def create_event_view(request):
-    if request.method == 'GET':
-        context = {
-            'form': EventForm
-        }
-        return render(request, 'admin_app/create_event_view.html', context=context)
-    if request.method == 'POST':
-        event = EventForm(request.POST)
-        event.save()
-        return HttpResponseRedirect(reverse('home'))
+# @require_http_methods(['GET', 'POST'])
+# @validate_staff_status(direct_login_page)
+# def create_event_view(request):
+#     if request.method == 'GET':
+#         context = {
+#             'form': EventForm
+#         }
+#         return render(request, 'admin_app/create_event_view.html', context=context)
+#     if request.method == 'POST':
+#         event = EventForm(request.POST)
+#         event.save()
+#         return HttpResponseRedirect(reverse('home'))
 
 def photo_upload(request, event_id):
     if request.method == 'POST':
@@ -140,5 +141,30 @@ def photo_upload(request, event_id):
         else:
             logger.error(photo_form.errors)
             return HttpResponse('error')
+
+def create_event_view(request):
+    photo_formset = modelformset_factory(Photo, form=PhotoForm, extra=3)
+    if request.method=='POST':
+        event_form = EventForm(request.POST)
+        formset = photo_formset(request.POST, request.FILES, queryset=Photo.objects.none())
+
+        if event_form.is_valid() and formset.is_valid():
+            event = event_form.save()
+
+            for form in formset.cleaned_data:
+                if form:
+                    image = form['image']
+                    photo = Photo(image=image, event=event)
+                    photo.save()
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        event_form = EventForm()
+        formset = photo_formset(queryset=Photo.objects.none())
+        context = {
+            'event_form': event_form,
+            'photo_form': formset
+        }
+        return render(request, 'admin_app/create_event_view.html', context=context)
+
 
 
