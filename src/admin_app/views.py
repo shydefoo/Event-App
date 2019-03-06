@@ -118,18 +118,21 @@ def event_view(request, event_id):
     if request.method == 'POST':
         event = get_object_or_404(Event, pk=event_id)
         f = EventForm(request.POST, instance=event)
-        photo_form = PhotoForm(request.POST, request.FILES)
         if f.is_valid():
             f.save()
-        if photo_form.is_valid():
-            photo_form.save(commit=False)
-            instance = photo_form.instance
-            instance.event = get_object_or_404(Event, pk=event_id)
-            instance.save()
-            return HttpResponseRedirect(reverse('home'))
-        else:
-            logger.error(photo_form.errors)
-            return HttpResponse('error')
+        logger.debug(request.FILES)
+        if request.FILES.get('image', None) != None:
+
+            photo_form = PhotoForm(request.POST, request.FILES)
+            if photo_form.is_valid():
+                photo_form.save(commit=False)
+                instance = photo_form.instance
+                instance.event = get_object_or_404(Event, pk=event_id)
+                instance.save()
+            else:
+                logger.error(photo_form.errors)
+                return HttpResponse('error')
+        return HttpResponseRedirect(reverse('event_view', kwargs={'event_id': event_id}))
         # return HttpResponseRedirect(reverse('home'))
 
 @require_http_methods(['GET', 'POST'])
