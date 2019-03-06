@@ -19,11 +19,13 @@ from django.urls import path, include
 
 import admin_app.urls
 import app.urls
+import client_app.urls
 from project import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(app.urls)),
+    path('client/', include(client_app.urls)),
     path('admin_dashboard/', include(admin_app.urls))
 ]
 

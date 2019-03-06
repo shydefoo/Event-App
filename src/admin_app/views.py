@@ -78,6 +78,7 @@ def login(request):
             logger.debug('Invalid form')
             return direct_login_page(request)
 
+@require_http_methods(['GET'])
 @validate_request(direct_login_page)
 @validate_staff_status(direct_login_page)
 def home(request):
@@ -96,6 +97,7 @@ def home(request):
 
 
 @require_http_methods(['GET', 'POST'])
+@validate_request(direct_login_page)
 @validate_staff_status(direct_login_page)
 def event_view(request, event_id):
     if request.method == 'GET':
@@ -136,6 +138,7 @@ def event_view(request, event_id):
         # return HttpResponseRedirect(reverse('home'))
 
 @require_http_methods(['GET', 'POST'])
+@validate_request(direct_login_page)
 @validate_staff_status(direct_login_page)
 def create_event_view(request):
     if request.method == 'GET':
