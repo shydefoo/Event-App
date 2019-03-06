@@ -1,4 +1,6 @@
 import uuid
+
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
@@ -40,16 +42,17 @@ class Category(models.Model):
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    date = models.DateField(auto_created=True, auto_now_add=True)
+    date_created = models.DateField(auto_created=True, auto_now_add=True)
+    datetime_of_event = models.DateTimeField(null=True, blank=True)
     description = models.CharField(max_length=2000)
-    category = models.ManyToManyField(Category)
+    category = models.ManyToManyField(Category, blank=True)
     title = models.CharField(max_length=200)
-    location = models.CharField(max_length=20)
+    location = models.CharField(max_length=20, blank=True)
     participants = models.ManyToManyField(UserAccount, related_name='participants', null=True, blank=True)
     likes = models.ManyToManyField(UserAccount, related_name='likes', null=True, blank=True)
 
     def get_absolute_url(self):
-        return "/events/%i/" %self.id
+        return reverse('event_view', kwargs={'event_id': self.id})
 
 
 class Comment(models.Model):

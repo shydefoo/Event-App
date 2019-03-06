@@ -1,15 +1,16 @@
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from admin_app.forms import LoginForm
+from admin_app.forms import LoginForm, EventForm
 from admin_app.utils.cookies_handler import set_cookie
 from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_request
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
+from app.utils.serializers.serializer_response_classes import SingleEvent
 from project.settings import JWT_COOKIE
 from utils.logger_class import EventsAppLogger
 
@@ -71,3 +72,25 @@ def home(request):
     logger.debug('home view')
     # return HttpResponse('Login success')
     events = Event.objects.all()
+    context = {
+        'event_list': events
+    }
+    return render(request, 'admin_app/home.html', context=context)
+
+
+@require_http_methods(['GET', 'POST'])
+def event_view(request, event_id):
+    if request.method == 'GET':
+        # render form with data
+        event = get_object_or_404(Event, pk=event_id)
+        single_event = SingleEvent(event)
+        event_form = EventForm(initial=single_event.__dict__)
+        context = {'form': event_form, 'event_id':event_id}
+        return render(request, 'admin_app/event_view.html', context=context)
+    if request.method == 'POST':
+        event = get_object_or_404(Event, pk=event_id)
+        f = EventForm(request.POST, instance=event)
+        f.save()
+        return HttpResponseRedirect(reverse('home'))
+
+
