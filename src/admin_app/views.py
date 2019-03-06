@@ -93,4 +93,14 @@ def event_view(request, event_id):
         f.save()
         return HttpResponseRedirect(reverse('home'))
 
-
+@require_http_methods(['GET', 'POST'])
+def create_event_view(request):
+    if request.method == 'GET':
+        context = {
+            'form': EventForm
+        }
+        return render(request, 'admin_app/create_event_view.html', context=context)
+    if request.method == 'POST':
+        event = EventForm(request.POST)
+        event.save()
+        return HttpResponseRedirect(reverse('home'))

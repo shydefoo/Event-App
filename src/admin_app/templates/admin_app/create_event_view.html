@@ -1,0 +1,16 @@
+{% extends 'admin_app/base.html' %}
+{% block content %}
+<form action="{% url 'create_event'%}" method="post">
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
+{% endblock content %}
+{% block javascript %}
+<script>
+    $(function () {
+        $('.datetime-input').datetimepicker({
+            format:'YYYY-MM-DD HH:mm'
+        });
+    });
+</script>
+{% endblock %}

@@ -1,12 +1,13 @@
 {% extends 'admin_app/base.html' %}
 
 {% block content %}
+<a class="btn btn-primary" href="{% url 'create_event'%}">Create Event</a>
   <h1>Event List</h1>
   {% if event_list %}
   <ul>
     {% for event in event_list %}
       <li>
-        <a href="{{ event.get_absolute_url }}">{{ event.title }}</a> ({{event.location}})
+        <a href="{{ event.get_absolute_url }}">{{ event.title }}</a> ({{event.location}}) - {{event.datetime_of_event}}
       </li>
     {% endfor %}
   </ul>
