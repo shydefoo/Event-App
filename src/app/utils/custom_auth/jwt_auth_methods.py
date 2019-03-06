@@ -7,7 +7,7 @@ from requests import Response
 from app.utils.custom_auth.password_handler import JWTTokenAuthentication, \
     BasicCustomAuthentication
 from project import settings
-from project.settings import HASH_ALGO
+from project.settings import HASH_ALGO, JWT_COOKIE
 from utils.logger_class import EventsAppLogger
 
 key = settings.SECRET_KEY
@@ -16,38 +16,40 @@ logger = EventsAppLogger(__name__).logger
 
 
 def validate_request(redirect_func: callable):
+    '''
+    Handles request authentication using jwt
+    Checks if header contains 'authorization' or request has cookie with key 'jwt'
+    :param redirect_func:
+    :return:
+    '''
     logger.debug('validate requests')
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
             authorization = request.META.get('HTTP_AUTHORIZATION', None)
+            jwt_cookie = request.COOKIES.get(JWT_COOKIE, None)
+            logger.debug('authorization: {}, jwt_cookie: {}'.format(authorization, jwt_cookie))
             if authorization is not None:
                 jwt_token = authorization.split(' ')[1]
-                try:
-                    decoded = jwt.decode(jwt_token, key, algorithm=HASH_ALGO)
-                    user_id = decoded['user_id']
-                    pw = decoded['pw']  # raw or hashed password?
-
-                    # user = get_object_or_404(UserAccount, pk=user_id)
-                    # salt = user.salt.salt.hex
-                    # if user.password == hash_password(pw, salt):
-                    auth_handler = JWTTokenAuthentication(pw, user_id)
-                    if auth_handler.authenticate():
-                        logger.debug('True')
-                        request.user = auth_handler.user
-                        return func(request, *args, **kwargs)
-                    else:
-                        logger.debug('False')
-                        # return HttpResponse('Invalid token', status=401)
-                        # function to redirect
-                        # return redirect_func
-                        return redirect_func(request, *args, **kwargs)
-                except Exception as e:
-                    logger.error(str(e))
-                    return HttpResponse('Error processing token', status=401)
+            elif jwt_cookie is not None:
+                jwt_token = str(jwt_cookie)
             else:
-                # return JsonResponse({'detail': 'Authentication credentials were not provided'}, status=401)
-                # return redirect_func
+                return redirect_func(request, *args, **kwargs)
+
+            try:
+                decoded = jwt.decode(jwt_token, key, algorithm=HASH_ALGO)
+                user_id = decoded['user_id']
+                pw = decoded['pw']  # raw or hashed password?
+                auth_handler = JWTTokenAuthentication(pw, user_id)
+                if auth_handler.authenticate():
+                    logger.debug('True')
+                    request.user = auth_handler.user
+                    return func(request, *args, **kwargs)
+                else:
+                    logger.debug('False')
+                    return redirect_func(request, *args, **kwargs)
+            except Exception as e:
+                logger.error(str(e))
                 return redirect_func(request, *args, **kwargs)
         return inner
 

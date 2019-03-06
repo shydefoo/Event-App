@@ -1,34 +1,19 @@
 import hashlib, uuid
+
+import jwt
+
 from app.models import UserAccount
 from django.shortcuts import get_object_or_404
 
-# def custom_authenticate(username, pw):
-#
-#     user = get_object_or_404(UserAccount, username=username)
-#     salt = user.salt
-#     pw = hash_password(pw, salt.salt.hex)
-#     if pw == user.password:
-#         return user
-#     else:
-#         return 'Invalid Password'
-#
-#
-# def hash_password(password, salt):
-#     hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
-#     return hashed_password
-#
-# def generate_new_password(password):
-#     salt = uuid.uuid4().hex
-#     hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
-#     return hashed_password, salt
-#
-# def print_password(password):
-#     salt = uuid.uuid4().hex
-#     hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
-#     print("salt: {}, hash_password: {}".format(salt, hashed_password))
+from project import settings
+from utils.logger_class import EventsAppLogger
 
+logger = EventsAppLogger(__name__).logger
 
 class CustomAuthenticationBase:
+    key = settings.SECRET_KEY
+    hash_algo = settings.HASH_ALGO
+
     def __init__(self, pw):
         self.pw = pw
 
@@ -40,21 +25,30 @@ class CustomAuthenticationBase:
 
 
 class BasicCustomAuthentication(CustomAuthenticationBase):
-    def __init__(self,pw, username):
+    def __init__(self, pw, username):
         super().__init__(pw)
         self.username = username
 
     def authenticate(self):
         user = get_object_or_404(UserAccount, username=self.username)
         self.salt = user.salt.salt.hex
-        pw = self.hash_password(self.pw, self.salt)
-        if pw == user.password:
+        hashed_pw = self.hash_password(self.pw, self.salt)
+        if hashed_pw == user.password:
+            self.user = user
+            self.generate_token()
             return user
         else:
             return None
 
+    def generate_token(self):
+        payload = {
+            'user_id': self.user.id.hex,
+            'pw': self.pw
+        }
+        self.token = str(jwt.encode(payload, self.key, algorithm=self.hash_algo), encoding='utf-8')
+
     def hash_password(self, pw, salt):
-        hashed_password = hashlib.sha512(str(pw+ salt).encode('utf-8')).hexdigest()
+        hashed_password = hashlib.sha512(str(pw + salt).encode('utf-8')).hexdigest()
         return hashed_password
 
     @staticmethod
@@ -62,6 +56,7 @@ class BasicCustomAuthentication(CustomAuthenticationBase):
         salt = uuid.uuid4().hex
         hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
         return hashed_password, salt
+
 
 class JWTTokenAuthentication(CustomAuthenticationBase):
     def __init__(self, pw, user_id):
@@ -74,8 +69,6 @@ class JWTTokenAuthentication(CustomAuthenticationBase):
         self.salt = user.salt.salt.hex
         return user.password == self.hash_password(self.pw, self.salt)
 
-
     def hash_password(self, pw, salt):
-        hashed_password = hashlib.sha512(str(pw+ salt).encode('utf-8')).hexdigest()
+        hashed_password = hashlib.sha512(str(pw + salt).encode('utf-8')).hexdigest()
         return hashed_password
-

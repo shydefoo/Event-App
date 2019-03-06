@@ -51,7 +51,7 @@ class EventsTests(IntegrationTests):
         data = {
             'event_id': self.event_id,
             'user_id': self.user_id,
-            'comment': 'omg'
+            'comment': 'testing comment'
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.text)

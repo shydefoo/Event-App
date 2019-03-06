@@ -6,8 +6,10 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from admin_app.forms import LoginForm
+from admin_app.utils.cookies_handler import set_cookie
 from app.utils.custom_auth.jwt_auth_methods import validate_request
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
+from project.settings import JWT_COOKIE
 from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
@@ -47,7 +49,10 @@ def login(request):
             auth_handler = BasicCustomAuthentication(pw, username)
             if auth_handler.authenticate():
                 logger.debug('Authentication success')
-                return HttpResponseRedirect(reverse('validator_view'))
+                response = HttpResponseRedirect(reverse('home'))
+                logger.debug('token: {}'.format(auth_handler.token))
+                set_cookie(response, JWT_COOKIE, auth_handler.token, None)
+                return response
             else:
                 logger.debug('Authentication failed')
                 pass
@@ -57,5 +62,10 @@ def login(request):
 
 @validate_request(direct_login_page)
 def home(request):
+    '''
+    Shows list of events
+    :param request:
+    :return:
+    '''
     logger.debug('home view')
     return HttpResponse('Login success')
