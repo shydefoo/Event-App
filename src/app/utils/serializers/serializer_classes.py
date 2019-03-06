@@ -17,13 +17,14 @@ class EventSerializer(BaseSerializer):
     def __init__(self, model, objects):
         super().__init__(model)
         self.objects = objects
+        self.key = 'events'
 
     def serialize(self):
-        temp_dict = {}
+        temp_dict = {self.key:[]}
         event_list = list(map(lambda event: SingleEvent(event), self.objects))
         for event in event_list:
-            temp_dict[event.id] = event.__dict__
-            temp_dict[event.id].pop('id')
+            temp_dict[self.key].append(event.__dict__)
+            # temp_dict[event.id].pop('id')
         logger.debug(temp_dict)
 
         return jsonpickle.encode(temp_dict)
@@ -43,12 +44,13 @@ class CommentsSerializer(BaseSerializer):
     def __init__(self, model, objects):
         super().__init__(model)
         self.objects = objects
+        self.key = 'comments'
 
     def serialize(self):
-        temp_dict = {}
+        temp_dict = {self.key:[]}
         comment_list = list(map(lambda comment: SingleComment(comment), self.objects))
         for comment in comment_list:
-            temp_dict[comment.id] = comment.__dict__
-            temp_dict[comment.id].pop('id')
+            temp_dict[self.key].append(comment.__dict__)
+            # temp_dict[comment.id].pop('id')
         logger.debug(temp_dict)
         return jsonpickle.encode(temp_dict)
