@@ -7,6 +7,7 @@ from django.views.decorators.http import require_http_methods
 
 from admin_app.forms import LoginForm
 from admin_app.utils.cookies_handler import set_cookie
+from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_request
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
 from project.settings import JWT_COOKIE
@@ -68,4 +69,5 @@ def home(request):
     :return:
     '''
     logger.debug('home view')
-    return HttpResponse('Login success')
+    # return HttpResponse('Login success')
+    events = Event.objects.all()

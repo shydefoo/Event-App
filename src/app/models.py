@@ -48,6 +48,9 @@ class Event(models.Model):
     participants = models.ManyToManyField(UserAccount, related_name='participants', null=True, blank=True)
     likes = models.ManyToManyField(UserAccount, related_name='likes', null=True, blank=True)
 
+    def get_absolute_url(self):
+        return "/events/%i/" %self.id
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)

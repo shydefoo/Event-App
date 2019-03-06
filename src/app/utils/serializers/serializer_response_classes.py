@@ -14,6 +14,7 @@ class SingleEvent(BaseSingleEntity):
         self.id = self.extract_id(event)
         self.likes = list(map(self.extract_id, list(event.likes.all())))
         self.participants = list(map(self.extract_id, list(event.participants.all())))
+        self.url = event.get_absolute_url()
 
     # def extract_id(self, object):
     #     return object.id.hex
