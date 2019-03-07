@@ -124,7 +124,6 @@ def event_view(request, event_id):
             f.save()
         logger.debug(request.FILES)
         if request.FILES.get('image', None) != None:
-
             photo_form = PhotoForm(request.POST, request.FILES)
             if photo_form.is_valid():
                 photo_form.save(commit=False)
