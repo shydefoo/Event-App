@@ -1,7 +1,7 @@
 import jwt
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
 from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
@@ -120,9 +120,13 @@ def get_event_photos(request, event_id):
 @require_http_methods(['POST'])
 @validate_request(redirect_func)
 def search_events(request):
+    card_template = 'client_app/search_card.html'
     search_text = request.POST['search_text']
+    logger.debug('search_text: {}'.format(search_text))
     events = list(Event.objects.filter(Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(location__icontains=search_text)))
+    logger.debug(events)
     event_serializer = EventSerializer(Event, events)
     json_string = event_serializer.serialize()
-    response = HttpResponse(json_string, content_type="application/json")
-    return response
+    return render(request, card_template, context=event_serializer.context)
+
+

@@ -1,0 +1,7 @@
+{% for event in event_list %}
+<div class="card">
+      <p>Event: <a href="{{ event.get_user_absolute_url}}">{{ event.title }}</a></p>
+      <p>Location: {{event.location}}<br>
+      <p>Date: {{event.datetime_of_event|date:"d-m-Y"}}, {{event.datetime_of_event|date:"Hi"}}<br>
+</div>
+{% endfor %}

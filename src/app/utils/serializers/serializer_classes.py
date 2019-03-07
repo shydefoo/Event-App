@@ -17,7 +17,7 @@ class EventSerializer(BaseSerializer):
     def __init__(self, model, objects):
         super().__init__(model)
         self.objects = objects
-        self.key = 'events'
+        self.key = 'event_list'
 
     def serialize(self):
         temp_dict = {self.key:[]}
@@ -26,6 +26,7 @@ class EventSerializer(BaseSerializer):
             temp_dict[self.key].append(event.__dict__)
             # temp_dict[event.id].pop('id')
         logger.debug(temp_dict)
+        self.context = temp_dict
 
         return jsonpickle.encode(temp_dict)
 

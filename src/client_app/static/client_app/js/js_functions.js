@@ -9,7 +9,12 @@ $(function(){
             success: searchSuccess,
             dataType: 'html'
         });
+
     });
+    if($('#search').val()==0){
+        console.log('empty')
+        $('#search-results').empty();
+    }
 });
 
 function searchSuccess(data, textStatus, jqXHR){
