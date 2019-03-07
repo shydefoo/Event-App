@@ -32,6 +32,10 @@ def login_fail_redirect(request, *args, **kwargs):
 def login_success_redirect(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('home'))
 
+def get_event_fail(request, *args, **kwargs):
+    return HttpResponseRedirect(reverse('home'))
+
+
 @require_http_methods(['GET'])
 @validate_request(login_fail_redirect)
 def validator_view(request):
