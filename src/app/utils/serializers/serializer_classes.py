@@ -54,3 +54,15 @@ class CommentsSerializer(BaseSerializer):
             # temp_dict[comment.id].pop('id')
         logger.debug(temp_dict)
         return jsonpickle.encode(temp_dict)
+
+
+class PhotoSerializer(BaseSerializer):
+    def __init__(self, model, objects):
+        self.objects = objects
+        self.key = 'image_urls'
+
+    def serialize(self):
+        temp_dict= {self.key:[]}
+        image_list = list(map(lambda image: image.image.url, self.objects))
+        temp_dict[self.key].extend(image_list)
+        return jsonpickle.encode(temp_dict)

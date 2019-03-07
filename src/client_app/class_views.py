@@ -8,3 +8,7 @@ class UserLoginView(StaffLoginView):
     auth_class = BasicCustomAuthentication
     login_fail_redirection_page = login_fail_redirect
     login_success_redirection_page = login_success_redirect
+
+
+class UserHomeView:
+    pass

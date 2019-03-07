@@ -5,7 +5,7 @@ import requests
 
 class EventsTests(IntegrationTests):
     base_url = 'http://localhost:8000/api/'
-    event_id = '6dbe4ec4-7caa-4b9a-aeef-41ad67a963c7'
+    event_id = 'ecc3e090-33b9-40f6-91b1-8ce920ba65f7'
     user_id = 'ccd4e975-9608-412c-acf2-5150caaef1b3'
     def test_get_events(self):
         url = self.base_url + 'get_events/'
