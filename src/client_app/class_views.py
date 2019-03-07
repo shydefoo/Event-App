@@ -1,6 +1,8 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
 
 from admin_app.class_views import StaffLoginView, BaseView
+from app.models import Event
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
 from client_app.views import login_fail_redirect, login_success_redirect
 
@@ -16,4 +18,15 @@ class UserHomeView(BaseView):
     template_name = 'client_app/home.html'
 
     def get(self, request, *arg, **kwargs):
-        return render(request, self.template_name, context=self.build_context())
+        events = Event.objects.all()
+        paginator = Paginator(events, 5)
+        page = request.GET.get('page', 1)
+        events = paginator.get_page(page)
+        return render(request, self.template_name, self.build_context(events))
+
+    def build_context(self, events, *args, **kwargs):
+        context = {
+            'event_list':events
+        }
+        return context
+

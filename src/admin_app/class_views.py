@@ -46,10 +46,10 @@ class StaffLoginView(BaseView):
                 return response
             else:
                 logger.debug('Authentication failed')
-                return self.login_fail_redirection_page(request)
+                return self.login_fail_redirection_page()
         else:
             logger.debug('Invalid form')
-            return self.login_fail_redirection_page(request)
+            return self.login_fail_redirection_page()
 
     def build_context(self, form):
         context = {
