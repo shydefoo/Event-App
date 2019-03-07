@@ -12,6 +12,7 @@ urlpatterns = [
     path('join_event/', join_event),
     path('leave_event/', leave_event),
     path('like_event/', like_event),
+    path('dislike_event/', dislike_event),
     path('comment_event/', comment_on_event),
     path('search_event/', search_events)
 ]

@@ -8,12 +8,33 @@
     <p>Date: {{event.datetime_of_event |date:"D d M Y"}}</p>
     <p>Time: {{event.datetime_of_event |date:"H:i"}}</p>
     <p>Location: {{event.location}}</p>
-    {% for participant in event.participant %}
-        <p>{{participant.username}}</p>
-    {% endfor %}
 
-    <a class="btn btn-primary" id="participate">Join Event</a>
+    {% if not participate %}
+    <button class="btn btn-primary" id="join" value="join">Join Event</button>
+    {% else %}
+    <button class="btn btn-primary" id="join" value="leave">Leave Event</button>
+    {% endif %}
 
+    {% if not like %}
+    <button class="btn btn-primary" id="like" value="like">Like Event</button>
+    {% else %}
+    <button class="btn btn-primary" id="like" value="dislike">Dislike Event</button>
+    {% endif %}
+
+    <h2>Participants:</h2>
+    <div id="participants">
+
+        {% for participant in event.participants.all %}
+            <p>{{participant.username}}</p>
+        {% endfor %}
+    </div>
+    <h2>Likes:</h2>
+    <div id="likes">
+
+        {% for like in event.likes.all %}
+            <p>{{like.username}}</p>
+        {% endfor %}
+    </div>
 {% endif %}
 
 </div>
