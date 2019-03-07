@@ -62,3 +62,13 @@ class EventsTests(IntegrationTests):
         # header = {}
         res = requests.get(url, headers=header)
         pprint.pprint(res.json())
+
+    def test_search_event(self):
+        url = self.base_url + 'search_event/'
+        header = self.build_header()
+        search_text = 'sports'
+        data = {
+            'search_text' : search_text
+        }
+        res = requests.post(url, headers=header, data=data)
+        pprint.pprint(res.json())

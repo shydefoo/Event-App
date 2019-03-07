@@ -1,4 +1,5 @@
 import jwt
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
@@ -115,3 +116,13 @@ def get_event_photos(request, event_id):
     photo_serializer = PhotoSerializer(Photo, images)
     json_string = photo_serializer.serialize()
     return JsonResponse(json_string, safe=False)
+
+@require_http_methods(['POST'])
+@validate_request(redirect_func)
+def search_events(request):
+    search_text = request.POST['search_text']
+    events = list(Event.objects.filter(Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(location__icontains=search_text)))
+    event_serializer = EventSerializer(Event, events)
+    json_string = event_serializer.serialize()
+    response = HttpResponse(json_string, content_type="application/json")
+    return response

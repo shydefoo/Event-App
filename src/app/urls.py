@@ -11,7 +11,8 @@ urlpatterns = [
     path('get_event_comments/<uuid:event_id>', get_event_comments),
     path('join_event/', join_event),
     path('like_event/', like_event),
-    path('comment_event/', comment_on_event)
+    path('comment_event/', comment_on_event),
+    path('search_event/', search_events)
 ]
 
 urlpatterns += [

@@ -1,15 +1,11 @@
 {% extends 'client_app/base.html' %}
 {% block content %}
-  <h1>Event List</h1>
-  {% if event_list %}
-  <ul>
-    {% for event in event_list %}
-      <li>
-        <a href="{{ event.get_absolute_url }}">{{ event.title }}</a> ({{event.location}}) - {{event.datetime_of_event}}
-      </li>
-    {% endfor %}
+  <h3>Search</h3>
+  <input type="text" id="search" name="search"/>
+  <ul id="search-results">
+
   </ul>
-  {% else %}
-    <p>There are no events.</p>
-  {% endif %}
+{% endblock %}
+{% block javascript%}
+
 {% endblock %}
