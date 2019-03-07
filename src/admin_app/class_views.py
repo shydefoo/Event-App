@@ -98,6 +98,8 @@ class StaffEventView(BaseView):
             logger.debug('error, '+ str(e))
             return self.page_redirection_event_fail()
 
+    @method_decorator(validate_request(login_fail_redirect))
+    @method_decorator(validate_request(login_fail_redirect))
     def post(self, request, event_id, *args, **kwargs):
         try:
             event = Event.objects.get(id=event_id)
@@ -134,10 +136,14 @@ class StaffCreateEventView(BaseView):
     form_invalid_redirection = create_event_fail
     page_redirection_create_event_success = create_event_success
 
+    @method_decorator(validate_request(login_fail_redirect))
+    @method_decorator(validate_request(login_fail_redirect))
     def get(self, request, *args, **kwargs):
         event_form = self.form_class()
         return render(request, self.template_name, context=self.build_context(event_form))
 
+    @method_decorator(validate_request(login_fail_redirect))
+    @method_decorator(validate_request(login_fail_redirect))
     def post(self, request, *args, **kwargs):
         event_form = self.form_class(request.POST)
         if event_form.is_valid():
