@@ -123,10 +123,13 @@ def search_events(request):
     card_template = 'client_app/search_card.html'
     search_text = request.POST['search_text']
     logger.debug('search_text: {}'.format(search_text))
-    events = list(Event.objects.filter(Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(location__icontains=search_text)))
-    logger.debug(events)
-    event_serializer = EventSerializer(Event, events)
-    json_string = event_serializer.serialize()
-    return render(request, card_template, context=event_serializer.context)
+    if search_text is not '':
+        events = list(Event.objects.filter(Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(location__icontains=search_text)))
+        logger.debug(events)
+        event_serializer = EventSerializer(Event, events)
+        json_string = event_serializer.serialize()
+        return render(request, card_template, context=event_serializer.context)
+    else:
+        return HttpResponse('')
 
 
