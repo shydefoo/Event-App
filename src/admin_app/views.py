@@ -17,7 +17,7 @@ from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
 
-def direct_login_page(request, *args, **kwargs):
+def login_fail_redirect(request, *args, **kwargs):
     '''
     performs redirection to login page
     :param request:
@@ -29,8 +29,11 @@ def direct_login_page(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('login'))
     # return HttpResponse('Error Logging in', status=401)
 
+def login_success_redirect(request, *args, **kwargs):
+    return HttpResponseRedirect(reverse('home'))
+
 @require_http_methods(['GET'])
-@validate_request(direct_login_page)
+@validate_request(login_fail_redirect)
 def validator_view(request):
     '''
     Checks if user that signs in has staff status or not
@@ -73,14 +76,14 @@ def login(request):
                 return response
             else:
                 logger.debug('Authentication failed')
-                return direct_login_page(request)
+                return login_fail_redirect(request)
         else:
             logger.debug('Invalid form')
-            return direct_login_page(request)
+            return login_fail_redirect(request)
 
 @require_http_methods(['GET'])
-@validate_request(direct_login_page)
-@validate_staff_status(direct_login_page)
+@validate_request(login_fail_redirect)
+@validate_staff_status(login_fail_redirect)
 def home(request):
     '''
     Shows list of events
@@ -97,8 +100,8 @@ def home(request):
 
 
 @require_http_methods(['GET', 'POST'])
-@validate_request(direct_login_page)
-@validate_staff_status(direct_login_page)
+@validate_request(login_fail_redirect)
+@validate_staff_status(login_fail_redirect)
 def event_view(request, event_id):
     if request.method == 'GET':
         # render form with data
@@ -137,8 +140,8 @@ def event_view(request, event_id):
         # return HttpResponseRedirect(reverse('home'))
 
 @require_http_methods(['GET', 'POST'])
-@validate_request(direct_login_page)
-@validate_staff_status(direct_login_page)
+@validate_request(login_fail_redirect)
+@validate_staff_status(login_fail_redirect)
 def create_event_view(request):
     if request.method == 'GET':
         event_form = EventForm()
