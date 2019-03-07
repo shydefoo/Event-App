@@ -1,4 +1,3 @@
-from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 
@@ -8,10 +7,10 @@ from django.views.decorators.http import require_http_methods
 
 from admin_app.forms import LoginForm, EventForm, PhotoForm
 from admin_app.utils.cookies_handler import set_cookie
-from app.models import Event, Photo
+from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_request, validate_staff_status
-from app.utils.custom_auth.password_handler import BasicCustomAuthentication, BasicStaffCustomAuthentication
-from app.utils.serializers.serializer_response_classes import SingleEvent, SingleEventForm
+from app.utils.custom_auth.password_handler import BasicStaffCustomAuthentication
+from app.utils.serializers.serializer_response_classes import SingleEventForm
 from project.settings import JWT_COOKIE
 from utils.logger_class import EventsAppLogger
 
@@ -30,9 +29,6 @@ def login_fail_redirect(request, *args, **kwargs):
     # return HttpResponse('Error Logging in', status=401)
 
 def login_success_redirect(request, *args, **kwargs):
-    return HttpResponseRedirect(reverse('home'))
-
-def get_event_fail(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -200,4 +196,15 @@ def create_event_view(request):
 #         return render(request, 'admin_app/create_event_view.html', context=context)
 
 
+def get_event_fail(request, *args, **kwargs):
+    # return HttpResponseRedirect(reverse('home'))
+    return HttpResponse('Error')
 
+def modify_event_success(request, event_id, *args, **kwargs):
+    return HttpResponseRedirect(reverse('event_view', kwargs={'event_id': event_id}))
+
+def create_event_success(request, *args, **kwargs):
+    return HttpResponseRedirect(reverse('home'))
+
+def create_event_fail(request, *args, **kwargs):
+    return HttpResponse('Error')

@@ -39,3 +39,5 @@ def login_fail_redirect(request):
 
 def login_success_redirect(request):
     return HttpResponseRedirect(reverse('client-home'))
+
+

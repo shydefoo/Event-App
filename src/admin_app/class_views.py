@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -6,7 +6,8 @@ from django.views import View
 
 from admin_app.forms import LoginForm, EventForm, PhotoForm
 from admin_app.utils.cookies_handler import CookieHandler
-from admin_app.views import login_fail_redirect, login_success_redirect, get_event_fail
+from admin_app.views import login_fail_redirect, login_success_redirect, get_event_fail, create_event_fail, \
+    create_event_success, modify_event_success
 from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_staff_status, validate_request
 from app.utils.custom_auth.password_handler import BasicStaffCustomAuthentication
@@ -18,8 +19,7 @@ logger = EventsAppLogger(__name__).logger
 
 class BaseView(View):
     def build_context(self, *args, **kwargs):
-        raise NotImplementedError
-
+        pass
 
 class StaffLoginView(BaseView):
     form_class = LoginForm
@@ -76,11 +76,15 @@ class StaffHomeView(BaseView):
 
 class StaffEventView(BaseView):
     template_name = 'admin_app/event_view.html'
-    event_redirection_fail = get_event_fail
+    page_redirection_event_fail = get_event_fail
+    page_redirection_event_modified_success = modify_event_success
     form_class_event = EventForm
     form_class_photo = PhotoForm
     event_form_builder = SingleEventForm
 
+
+    @method_decorator(validate_request(login_fail_redirect))
+    @method_decorator(validate_request(login_fail_redirect))
     def get(self, request, event_id, *args, **kwargs):
         try:
             event = Event.objects.get(id=event_id)
@@ -92,7 +96,27 @@ class StaffEventView(BaseView):
             return render(request, self.template_name, context=context)
         except Exception as e:
             logger.debug('error, '+ str(e))
-            return self.event_redirection_fail()
+            return self.page_redirection_event_fail()
+
+    def post(self, request, event_id, *args, **kwargs):
+        try:
+            event = Event.objects.get(id=event_id)
+            event_form = self.form_class_event(request.POST, instance=event)
+            if event_form.is_valid():
+                event_form.save()
+            if request.FILES.get('image',None) != None:
+                photo_form = PhotoForm(request.POST, request.FILES)
+                if photo_form.is_valid():
+                    photo_form.save(commit=False)
+                    instance = photo_form.instance
+                    instance.event = Event.objects.get(id=event_id)
+                    instance.save()
+                else:
+                    logger.error(photo_form.errors)
+                    return self.page_redirection_event_fail()
+            return self.page_redirection_event_modified_success(event_id)
+        except Exception as e:
+            return self.page_redirection_event_fail()
 
     def build_context(self,event_id, event_form, photo_form, event_images):
         context = {
@@ -102,3 +126,28 @@ class StaffEventView(BaseView):
             'images': event_images
         }
         return context
+
+
+class StaffCreateEventView(BaseView):
+    template_name = 'admin_app/create_event_view.html'
+    form_class = EventForm
+    form_invalid_redirection = create_event_fail
+    page_redirection_create_event_success = create_event_success
+
+    def get(self, request, *args, **kwargs):
+        event_form = self.form_class()
+        return render(request, self.template_name, context=self.build_context(event_form))
+
+    def post(self, request, *args, **kwargs):
+        event_form = self.form_class(request.POST)
+        if event_form.is_valid():
+            event_form.save()
+            return self.page_redirection_create_event_success()
+
+    def build_context(self, event_form):
+        context = {
+            'form': event_form
+        }
+        return context
+
+
