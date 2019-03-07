@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
 
 from admin_app.class_views import StaffLoginView, BaseView
@@ -35,8 +35,17 @@ class UserHomeView(BaseView):
         }
         return context
 
+@method_decorator(decorator, name='get')
 class UserEventView(BaseView):
     template_name = 'client_app/event_view.html'
 
-    def get(self, request, *args, **kwargs):
-        return HttpResponse('okay')
+    def get(self, request, event_id, *args, **kwargs):
+        event = get_object_or_404(Event, pk=event_id)
+
+        return render(request, self.template_name, context = self.build_context(event))
+
+    def build_context(self, event):
+        context = {
+            'event':event
+        }
+        return context

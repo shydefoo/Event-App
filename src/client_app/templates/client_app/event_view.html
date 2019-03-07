@@ -1,7 +1,20 @@
 {% extends 'client_app/base.html' %}
-{% block contents %}
+{% block content %}
+<h1>Event</h1>
+<div class="container">
 {% if event %}
+    <p>Title: {{event.title}} </p>
+    <p>Description: {{event.description}}</p>
+    <p>Date: {{event.datetime_of_event |date:"D d M Y"}}</p>
+    <p>Time: {{event.datetime_of_event |date:"H:i"}}</p>
+    <p>Location: {{event.location}}</p>
+    {% for participant in event.participant %}
+        <p>{{participant.username}}</p>
+    {% endfor %}
 
-{% end if%}
+    <a class="btn btn-primary" id="participate">Join Event</a>
 
+{% endif %}
+
+</div>
 {% endblock %}

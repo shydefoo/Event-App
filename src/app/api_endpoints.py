@@ -53,11 +53,29 @@ def get_events(request):
 def join_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id')
+    if user_id is '':
+        user_is = request.user
     event = get_object_or_404(Event, pk=event_id)
     user = get_object_or_404(UserAccount, pk=user_id)
-    event.participants.add(user)
-    logger.info('{} joined event'.format(user))
-    return HttpResponse('Successfully joined event', status=202)
+    participants = list(event.participants.all())
+    if user not in participants:
+        event.participants.add(user)
+        logger.info('{} joined event'.format(user))
+        return HttpResponse('Successfully joined event', status=202)
+    else:
+        return HttpResponse('Already joined event', status=202)
+
+def leave_event(request):
+    event_id = request.POST.get('event_id')
+    user_id = request.POST.get('user_id')
+    event = get_object_or_404(Event, pk=event_id)
+    user = get_object_or_404(UserAccount, pk=user_id)
+    participants = list(event.participants.all())
+    if user in participants:
+        event.participants.remove(user)
+        return HttpResponse('Successfully left event', status=202)
+    else:
+        return HttpResponse('Invalid request', status=202)
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func)
@@ -128,8 +146,31 @@ def search_events(request):
         logger.debug(events)
         event_serializer = EventSerializer(Event, events)
         json_string = event_serializer.serialize()
+        # return render(request, card_template, context=event_serializer.context)
+        return JsonResponse(json_string, safe=False)
+    else:
+        # return HttpResponse('')
+        return JsonResponse('', safe=False)
+
+
+@require_http_methods(['POST'])
+@validate_request(redirect_func)
+def search_events_render(request):
+    '''
+    Additional endpoint to render html instead of sending json file back
+    :param request:
+    :return:
+    '''
+    card_template = 'client_app/search_card.html'
+    search_text = request.POST['search_text']
+    logger.debug('search_text: {}'.format(search_text))
+    if search_text is not '':
+        events = list(Event.objects.filter(Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(location__icontains=search_text)))
+        logger.debug(events)
+        event_serializer = EventSerializer(Event, events)
+        json_string = event_serializer.serialize()
         return render(request, card_template, context=event_serializer.context)
+        # return JsonResponse(json_string, safe=False)
     else:
         return HttpResponse('')
-
-
+        # return JsonResponse('', safe=False)

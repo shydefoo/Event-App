@@ -44,6 +44,16 @@ class EventsTests(IntegrationTests):
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.text)
 
+    def test_leave_event(self):
+        url = self.base_url + 'leave_event/'
+        header = self.build_header()
+        data = {
+            'event_id': self.event_id,
+            'user_id': self.user_id
+        }
+        res = requests.post(url, headers=header, data=data)
+        pprint.pprint(res.text)
+
     def test_comment_on_event(self):
         url = self.base_url + 'comment_event/'
         header = self.build_header()

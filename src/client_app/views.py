@@ -33,11 +33,11 @@ def home(request):
     return render(request, 'admin_app/home.html', context=context)
 
 
-def login_fail_redirect(request):
+def login_fail_redirect(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('client-login'))
 
 
-def login_success_redirect(request):
+def login_success_redirect(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('client-home'))
 
 
