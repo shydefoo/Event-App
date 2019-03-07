@@ -7,26 +7,34 @@
   </ul>
   {% for event in event_list %}
     {# Each "contact" is a Contact model object. #}
-    <a href="{{ event.get_absolute_url }}">{{ event.title }}</a> ({{event.location}}) - {{event.datetime_of_event}<br>
+    <div class="card">
+      <p>Event: <a href="{{ event.get_user_absolute_url}}">{{ event.title }}</a></p>
+      <p>Location: {{event.location}}<br>
+      <p>Date: {{event.datetime_of_event|date:"d-m-Y"}}, Time: {{event.datetime_of_event|date:"Hi"}}<br>
+
+    </div>
+
   {% endfor %}
-{% endblock %}
 <div class="pagination">
     <span class="step-links">
-        {% if events.has_previous %}
+        {% if event_list.has_previous %}
             <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ events.previous_page_number }}">previous</a>
+            <a href="?page={{ event_list.previous_page_number }}">previous</a>
         {% endif %}
 
         <span class="current">
-            Page {{ events.number }} of {{ events.paginator.num_pages }}.
+            Page {{ event_list.number }} of {{ event_list.paginator.num_pages }}.
         </span>
 
-        {% if events.has_next %}
-            <a href="?page={{ events.next_page_number }}">next</a>
-            <a href="?page={{ events.paginator.num_pages }}">last &raquo;</a>
+        {% if event_list.has_next %}
+            <a href="?page={{ event_list.next_page_number }}">next</a>
+            <a href="?page={{ event_list.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
 </div>
+
+{% endblock %}
+
 
 
 {% block javascript%}

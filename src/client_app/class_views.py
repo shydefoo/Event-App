@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import render
 
 from admin_app.class_views import StaffLoginView, BaseView
@@ -18,8 +19,8 @@ class UserHomeView(BaseView):
     template_name = 'client_app/home.html'
 
     def get(self, request, *arg, **kwargs):
-        events = Event.objects.all()
-        paginator = Paginator(events, 5)
+        events = Event.objects.all().order_by('-datetime_of_event')
+        paginator = Paginator(events, 2)
         page = request.GET.get('page', 1)
         events = paginator.get_page(page)
         return render(request, self.template_name, self.build_context(events))
@@ -30,3 +31,8 @@ class UserHomeView(BaseView):
         }
         return context
 
+class UserEventView(BaseView):
+    template_name = 'client_app/event_view.html'
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('okay')

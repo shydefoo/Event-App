@@ -56,6 +56,9 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('event_view', kwargs={'event_id': self.id})
 
+    def get_user_absolute_url(self):
+        return reverse('client-event-view', kwargs={'event_id':self.id})
+
     def __str__(self):
         return self.title
 
