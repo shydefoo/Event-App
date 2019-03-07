@@ -35,6 +35,11 @@
             <p>{{like.username}}</p>
         {% endfor %}
     </div>
+
+    <h2>Comments:</h2>
+    <div id="Comments">
+        {% include 'client_app/comment_card.html' %}
+    </div>
 {% endif %}
 
 </div>
