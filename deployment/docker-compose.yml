@@ -3,18 +3,24 @@ services:
   db_service:
     image: bitnami/mysql
     env_file:
-      - ./deployment/.env
+      - .db.env
+    environment:
+      - MYSQL_DATABASE=event_app_db
+    ports:
+      - "3306:3306"
     networks:
       - webnet
     deploy:
       replicas: 1
     volumes:
-      -db_vol:/bitnami/mysql/data
+      - db_vol:/bitnami/mysql/data
 
   web_app:
-    image: entry-task:v1.0
+    image: entry-task:v1.2
     env_file:
       - .env
+    networks:
+      - webnet
     deploy:
       replicas: 1
     ports:
@@ -26,10 +32,11 @@ services:
       - static_vol:/app/src/static
 
 
-  networks:
-    webnet:
+networks:
+  webnet:
 
-  volumes:
-    db_vol:
-    image_vol:
-    static_vol:
+volumes:
+  db_vol:
+  image_vol:
+  static_vol:
+
