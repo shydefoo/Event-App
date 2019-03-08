@@ -72,16 +72,16 @@ $(function () {
 });
 
 
-function refreshList(url){
+function refreshList(url, success){
     $.ajax({
         type:'GET',
         url: url,
-        success: _refreshList,
+        success: success,
         dataType: 'json'
     });
 }
 
-function _refreshList(data, textStatus, jqXHR){
+function _refreshParticipantsList(data, textStatus, jqXHR){
     var contents = "";
     var obj = jQuery.parseJSON(data);
     $.each(obj, function(index, jsonObject){
@@ -94,12 +94,24 @@ function _refreshList(data, textStatus, jqXHR){
     $('#participants').html(contents)
 }
 
+function _refreshLikeList(data, textStatus, jqXHR){
+    var contents = "";
+    var obj = jQuery.parseJSON(data);
+    $.each(obj, function(index, jsonObject){
+        for (var i=0;i<jsonObject.length;i++){
+            contents += "<div class='card'>";
+            contents += "<p>" + jsonObject[i].username +"</p>";
+            contents += "</div>"
+        }
+    });
+    $('#likes').html(contents)
+}
 function handleParticipateResponse(data, textStatus, jqXHR){
 //    console.log('joined event!');
     $('#join').val("leave");
     $('#join').html('Leave Event');
     console.log('joined event!');
-    refreshList(url);
+    refreshList(url, _refreshParticipantsList);
 
 }
 
@@ -107,7 +119,7 @@ function HandleUnparticipateResponse(data, textStatus, jqXHR){
     $('#join').val('join');
     $('#join').html('Join Event');
     url = '/api/get_event_participants/'+event_id;
-    refreshList(url);
+    refreshList(url, _refreshParticipantsList);
 }
 
 function HandleLikeResponse(data, textStatus, jqXHR){
@@ -115,7 +127,7 @@ function HandleLikeResponse(data, textStatus, jqXHR){
     $('#like').val('dislike');
     $('#like').html('Dislike Event');
     url = '/api/get_event_likes/'+event_id;
-    refreshList(url);
+    refreshList(url, _refreshLikeList);
 }
 
 function HandleDisikeResponse(data, textStatus, jqXHR){
@@ -123,7 +135,7 @@ function HandleDisikeResponse(data, textStatus, jqXHR){
     $('#like').val('like');
     $('#like').html('Like Event');
     url = '/api/get_event_likes/'+event_id;
-    refreshList(url);
+    refreshList(url, _refreshLikeList);
 }
 
 function HandleCommentOnEvent(data, textStatus, jqXHR){
@@ -148,7 +160,5 @@ function DisplayComments(data, textStatus, jqXHR){
             contents += "</div>"
         }
     });
-
-    console.log(contents)
     $('#comments').html(contents)
 }
