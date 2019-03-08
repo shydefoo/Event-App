@@ -94,3 +94,9 @@ class EventsTests(IntegrationTests):
         header = self.build_header()
         res = requests.get(url, headers=header)
         pprint.pprint(res.json())
+
+    def test_get_event_photos(self):
+        url = self.base_url + 'get_event_photos/{}'.format(self.event_id)
+        header = self.build_header()
+        res = requests.get(url, headers=header)
+        pprint.pprint(res.json())

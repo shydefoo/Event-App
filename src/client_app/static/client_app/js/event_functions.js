@@ -1,6 +1,14 @@
 var arr = window.location.pathname.split('/')
 var event_id = arr[arr.length-1]
 $(function () {
+    // Load event photos
+    $.ajax({
+        type: "GET",
+        url: "/api/get_event_photos/"+event_id,
+        success: displayPhotos,
+        dataType: 'json',
+    });
+
     $('#join').on('click', function () {
         if($('#join').val() =='join'){
             $.ajax({
@@ -20,7 +28,7 @@ $(function () {
                 data: {
                     'event_id':event_id,
                 },
-                success: HandleUnparticipateResponse,
+                success: handleUnparticipateResponse,
                 dataType : 'json',
             });
         }
@@ -35,7 +43,7 @@ $(function () {
                 data: {
                     'event_id': event_id
                 },
-                success: HandleLikeResponse,
+                success: handleLikeResponse,
                 dataType:'json',
             });
         }
@@ -46,7 +54,7 @@ $(function () {
                 data: {
                     'event_id': event_id
                 },
-                success: HandleDisikeResponse,
+                success: handleDisikeResponse,
                 dataType:'json',
             });
         }
@@ -63,7 +71,7 @@ $(function () {
                     'event_id': event_id,
                     'comment': text,
                 },
-                success: HandleCommentOnEvent,
+                success: handleCommentOnEvent,
                 dataType: 'json'
             });
         }
@@ -111,18 +119,19 @@ function handleParticipateResponse(data, textStatus, jqXHR){
     $('#join').val("leave");
     $('#join').html('Leave Event');
     console.log('joined event!');
+    url = '/api/get_event_participants/'+event_id;
     refreshList(url, _refreshParticipantsList);
 
 }
 
-function HandleUnparticipateResponse(data, textStatus, jqXHR){
+function handleUnparticipateResponse(data, textStatus, jqXHR){
     $('#join').val('join');
     $('#join').html('Join Event');
     url = '/api/get_event_participants/'+event_id;
     refreshList(url, _refreshParticipantsList);
 }
 
-function HandleLikeResponse(data, textStatus, jqXHR){
+function handleLikeResponse(data, textStatus, jqXHR){
     console.log('data: '+ data);
     $('#like').val('dislike');
     $('#like').html('Dislike Event');
@@ -130,7 +139,7 @@ function HandleLikeResponse(data, textStatus, jqXHR){
     refreshList(url, _refreshLikeList);
 }
 
-function HandleDisikeResponse(data, textStatus, jqXHR){
+function handleDisikeResponse(data, textStatus, jqXHR){
     console.log('data: '+ data);
     $('#like').val('like');
     $('#like').html('Like Event');
@@ -138,16 +147,16 @@ function HandleDisikeResponse(data, textStatus, jqXHR){
     refreshList(url, _refreshLikeList);
 }
 
-function HandleCommentOnEvent(data, textStatus, jqXHR){
+function handleCommentOnEvent(data, textStatus, jqXHR){
     $.ajax({
         type: 'GET',
         url: '/api/get_event_comments/'+event_id,
-        success: DisplayComments,
+        success: displayComments,
         dataType: 'json',
     });
 }
 
-function DisplayComments(data, textStatus, jqXHR){
+function displayComments(data, textStatus, jqXHR){
     console.log('display comments');
     var contents = "";
     var obj = jQuery.parseJSON(data)
@@ -161,4 +170,21 @@ function DisplayComments(data, textStatus, jqXHR){
         }
     });
     $('#comments').html(contents)
+}
+
+function displayPhotos(data, textStatus, jqXHR){
+    var default_val = "<h3>There are currently no photos</h3>";
+    var contents = ""
+    var obj = jQuery.parseJSON(data)
+    $.each(obj, function(index, jsonObject){
+        for (var i=0;i<jsonObject.length;i++){
+            contents += "<div class='card'>";
+            contents += "<img src='"+jsonObject[i]+"'/>"
+            contents += "</div>"
+        }
+    });
+    if(contents == ""){
+        contents = default_val
+    }
+    $('#photos').html(contents)
 }
