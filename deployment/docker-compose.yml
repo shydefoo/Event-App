@@ -1,0 +1,35 @@
+version: "3.0"
+services:
+  db_service:
+    image: bitnami/mysql
+    env_file:
+      - ./deployment/.env
+    networks:
+      - webnet
+    deploy:
+      replicas: 1
+    volumes:
+      -db_vol:/bitnami/mysql/data
+
+  web_app:
+    image: entry-task:v1.0
+    env_file:
+      - .env
+    deploy:
+      replicas: 1
+    ports:
+      - "80:8000"
+    depends_on:
+      - db_service
+    volumes:
+      - image_vol:/app/Images
+      - static_vol:/app/src/static
+
+
+  networks:
+    webnet:
+
+  volumes:
+    db_vol:
+    image_vol:
+    static_vol:
