@@ -1,3 +1,14 @@
+<div class="card">
+    {{ comment_form.as_p }}
+    <button id='comment-on-event' class="btn btn-primary">Comment</button>
+</div>
+
+<div id="comments">
 {% for comment in event.comment_set.all %}
-    <p>{{ comment.comment}}</p>
+    <div class="card">
+        <p>User: {{comment.user}}</p>
+        <p>Date: {{comment.date}}</p>
+        <p>Comment: {{ comment.comment}}</p>
+    </div>
 {% endfor %}
+</div>

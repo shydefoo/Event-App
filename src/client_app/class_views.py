@@ -7,6 +7,7 @@ from admin_app.class_views import StaffLoginView, BaseView
 from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_request
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
+from client_app.forms import CommentForm
 from client_app.views import login_fail_redirect, login_success_redirect
 from utils.logger_class import EventsAppLogger
 
@@ -45,17 +46,19 @@ class UserEventView(BaseView):
         event = get_object_or_404(Event, pk=event_id)
         participate = None
         like = None
+        comment_form = CommentForm()
         if request.user in list(event.participants.all()):
             participate = 1
         if request.user in list(event.likes.all()):
             like = 1
         logger.debug('par: {}, like:{}'.format(participate, like))
-        return render(request, self.template_name, context = self.build_context(event, participate, like))
+        return render(request, self.template_name, context = self.build_context(event, participate, like, comment_form))
 
-    def build_context(self, event, participate, like):
+    def build_context(self, event, participate, like, comment_form):
         context = {
             'event':event,
             'participate': participate,
-            'like': like
+            'like': like,
+            'comment_form': comment_form
         }
         return context

@@ -1,3 +1,5 @@
+from datetime import date
+
 import jwt
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
@@ -137,15 +139,21 @@ def dislike_event(request):
 @validate_request(redirect_func)
 def comment_on_event(request):
     event_id = request.POST.get('event_id')
-    user_id = request.POST.get('user_id')
+    user_id = request.POST.get('user_id', None)
+    if user_id is None:
+        user = request.user
+    else:
+        user = get_object_or_404(UserAccount, pk=user_id)
     comment = request.POST.get('comment')
     event = get_object_or_404(Event, pk=event_id)
-    user = get_object_or_404(UserAccount, pk=user_id)
-    comment = Comment(comment=comment, user=user, event=event)
-    comment.save()
+    id = uuid.uuid4()
+    comment = Comment.objects.create(id=id, comment=comment, user=user, event=event)
+    logger.debug("created comment: {}".format(comment))
     logger.debug('{} added a comment'.format(user))
-    return HttpResponse('Successfully commented on event', status=202)
-
+    res = {
+        'reply': 'Successfully commented on event'
+    }
+    return JsonResponse(res, safe=False)
 
 @require_http_methods(['GET'])
 @validate_request(redirect_func)

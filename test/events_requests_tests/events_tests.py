@@ -5,7 +5,7 @@ import requests
 
 class EventsTests(IntegrationTests):
     base_url = 'http://localhost:8000/api/'
-    event_id = 'ecc3e090-33b9-40f6-91b1-8ce920ba65f7'
+    event_id = '466b945f-3843-43c2-96fe-45b106c07c5a'
     user_id = 'ccd4e975-9608-412c-acf2-5150caaef1b3'
     def test_get_events(self):
         url = self.base_url + 'get_events/'
@@ -61,7 +61,7 @@ class EventsTests(IntegrationTests):
         data = {
             'event_id': self.event_id,
             'user_id': self.user_id,
-            'comment': 'testing comment'
+            'comment': 'testing123'
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.text)

@@ -24,10 +24,10 @@ class SingleEvent(BaseSingleEntity):
 
 class SingleComment(BaseSingleEntity):
     def __init__(self, comment):
-        self.date = comment.date.strftime('%d-%m-%y')
+        self.datetime = comment.datetime.strftime('%d-%m-%y, %H%M')
         self.comment = comment.comment
         self.id = comment.id.hex
-        self.user = self.extract_id(comment.user)
+        self.username = comment.user.username
 
 
 class SingleEventForm(SingleEvent):

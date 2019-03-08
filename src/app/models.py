@@ -29,6 +29,9 @@ class UserAccount(models.Model):
     )
     salt = models.OneToOneField(UserSaltTable, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.username
+
 
 # class AdminUserAccount(models.Model):
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -41,6 +44,8 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category
+
+
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -62,13 +67,17 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
-
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     comment = models.CharField(max_length=2000)
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    date = models.DateField(auto_created=True, auto_now_add=True)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, null=True)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
+    datetime = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-datetime']
+
+
 
 
 class Photo(models.Model):
