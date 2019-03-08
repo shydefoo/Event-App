@@ -1,3 +1,5 @@
+import uuid
+
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -67,7 +69,7 @@ class StaffHomeView(BaseView):
     @method_decorator(validate_request(login_fail_redirect))
     @method_decorator(validate_staff_status(login_fail_redirect))
     def get(self, request, *args, **kwargs):
-        events = Event.objects.all()
+        events = Event.objects.all().order_by('-datetime_of_event')
         context = self.build_context(events)
         return render(request, self.template_name, context=context)
 
@@ -154,7 +156,11 @@ class StaffCreateEventView(BaseView):
     def post(self, request, *args, **kwargs):
         event_form = self.form_class(request.POST)
         if event_form.is_valid():
-            event_form.save()
+            logger.debug(event_form.instance)
+            logger.debug(type(event_form.instance))
+            instance = event_form.instance
+            instance.id = uuid.uuid4()
+            instance.save()
             return self.page_redirection_create_event_success()
 
     def build_context(self, event_form):

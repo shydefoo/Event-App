@@ -49,7 +49,7 @@ class Category(models.Model):
 
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    date_created = models.DateField(auto_created=True, auto_now_add=True)
+    date_created = models.DateField(auto_now=True)
     datetime_of_event = models.DateTimeField(null=True, blank=True)
     description = models.CharField(max_length=2000)
     category = models.ManyToManyField(Category, blank=True)
