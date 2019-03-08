@@ -36,3 +36,8 @@ class SingleEventForm(SingleEvent):
 
     def extract_category(self, category):
         return category.id
+
+class SingleUser(BaseSingleEntity):
+    def __init__(self, user):
+        self.id = self.extract_id(user)
+        self.username = user.username

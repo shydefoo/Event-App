@@ -3,7 +3,7 @@
     <button id='comment-on-event' class="btn btn-primary">Comment</button>
 </div>
 
-<div id="comments">
+<div id="comments" stype="overflow:auto">
 {% for comment in event.comment_set.all %}
     <div class="card">
         <p>User: {{comment.user}}</p>

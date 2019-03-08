@@ -82,3 +82,15 @@ class EventsTests(IntegrationTests):
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.text)
+
+    def test_get_event_participants(self):
+        url = self.base_url + 'get_event_participants/{}'.format(self.event_id)
+        header = self.build_header()
+        res = requests.get(url, headers=header)
+        pprint.pprint(res.json())
+
+    def test_get_event_likes(self):
+        url = self.base_url + 'get_event_likes/{}'.format(self.event_id)
+        header = self.build_header()
+        res = requests.get(url, headers=header)
+        pprint.pprint(res.json())

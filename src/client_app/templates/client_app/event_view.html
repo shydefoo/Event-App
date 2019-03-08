@@ -23,16 +23,19 @@
 
     <h2>Participants:</h2>
     <div id="participants">
-
         {% for participant in event.participants.all %}
-            <p>{{participant.username}}</p>
+            <div class="card">
+                <p>{{participant.username}}</p>
+            </div>
         {% endfor %}
     </div>
     <h2>Likes:</h2>
     <div id="likes">
-
         {% for like in event.likes.all %}
-            <p>{{like.username}}</p>
+            <div class="card">
+                <p>{{like.username}}</p>
+            </div>
+
         {% endfor %}
     </div>
 

@@ -1,6 +1,6 @@
+var arr = window.location.pathname.split('/')
+var event_id = arr[arr.length-1]
 $(function () {
-    var arr = window.location.pathname.split('/')
-    var event_id = arr[arr.length-1]
     $('#join').on('click', function () {
         if($('#join').val() =='join'){
             $.ajax({
@@ -71,34 +71,62 @@ $(function () {
     });
 });
 
+
+function refreshList(url){
+    $.ajax({
+        type:'GET',
+        url: url,
+        success: _refreshList,
+        dataType: 'json'
+    });
+}
+
+function _refreshList(data, textStatus, jqXHR){
+    var contents = "";
+    var obj = jQuery.parseJSON(data);
+    $.each(obj, function(index, jsonObject){
+        for (var i=0;i<jsonObject.length;i++){
+            contents += "<div class='card'>";
+            contents += "<p>" + jsonObject[i].username +"</p>";
+            contents += "</div>"
+        }
+    });
+    $('#participants').html(contents)
+}
+
 function handleParticipateResponse(data, textStatus, jqXHR){
 //    console.log('joined event!');
     $('#join').val("leave");
     $('#join').html('Leave Event');
     console.log('joined event!');
+    refreshList(url);
+
 }
 
 function HandleUnparticipateResponse(data, textStatus, jqXHR){
     $('#join').val('join');
     $('#join').html('Join Event');
+    url = '/api/get_event_participants/'+event_id;
+    refreshList(url);
 }
 
-
 function HandleLikeResponse(data, textStatus, jqXHR){
-    console.log('data: '+ data)
-    $('#like').val('dislike')
-    $('#like').html('Dislike Event')
+    console.log('data: '+ data);
+    $('#like').val('dislike');
+    $('#like').html('Dislike Event');
+    url = '/api/get_event_likes/'+event_id;
+    refreshList(url);
 }
 
 function HandleDisikeResponse(data, textStatus, jqXHR){
-    console.log('data: '+ data)
-    $('#like').val('like')
-    $('#like').html('Like Event')
+    console.log('data: '+ data);
+    $('#like').val('like');
+    $('#like').html('Like Event');
+    url = '/api/get_event_likes/'+event_id;
+    refreshList(url);
 }
 
 function HandleCommentOnEvent(data, textStatus, jqXHR){
-    var arr = window.location.pathname.split('/')
-    var event_id = arr[arr.length-1]
     $.ajax({
         type: 'GET',
         url: '/api/get_event_comments/'+event_id,

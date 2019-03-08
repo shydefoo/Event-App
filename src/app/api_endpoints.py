@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods
 from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
 from project import settings
 from utils.logger_class import EventsAppLogger
-from app.utils.serializers.serializer_classes import EventSerializer, EventParticipantsSerializer, CommentsSerializer, \
+from app.utils.serializers.serializer_classes import EventSerializer, UsersSerializer, CommentsSerializer, \
     PhotoSerializer
 from .models import *
 
@@ -157,10 +157,10 @@ def comment_on_event(request):
 
 @require_http_methods(['GET'])
 @validate_request(redirect_func)
-def get_event_partitipants(request, event_id):
+def get_event_participants(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
-    participants = event.participants.all()
-    json_string = EventParticipantsSerializer(participants).serialize()
+    participants = list(event.participants.all())
+    json_string = UsersSerializer(Event, participants).serialize()
     return JsonResponse(json_string, safe=False)
 
 
@@ -168,7 +168,9 @@ def get_event_partitipants(request, event_id):
 @validate_request(redirect_func)
 def get_event_likes(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
-    likes = event.likes.all()
+    likes = list(event.likes.all())
+    json_string = UsersSerializer(Event, likes).serialize()
+    return JsonResponse(json_string, safe=False)
 
 
 @require_http_methods(['GET'])

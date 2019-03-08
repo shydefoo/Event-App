@@ -1,7 +1,7 @@
 import jsonpickle
 
 from utils.logger_class import EventsAppLogger
-from app.utils.serializers.serializer_response_classes import SingleEvent, SingleComment
+from app.utils.serializers.serializer_response_classes import SingleEvent, SingleComment, SingleUser
 
 logger = EventsAppLogger(__name__).logger
 
@@ -31,14 +31,20 @@ class EventSerializer(BaseSerializer):
         return jsonpickle.encode(temp_dict)
 
 
-class EventParticipantsSerializer(BaseSerializer):
-    def __init__(self, model, participants):
+class UsersSerializer(BaseSerializer):
+    def __init__(self, model, users):
         super().__init__(model)
-        self.participants = participants
+        self.participants = users
+        self.key = 'users'
 
     def serialize(self):
-        id_list = list(map(lambda x: x.id.hex, list(self.participants)))
-        return jsonpickle.encode(id_list)
+        temp_dict = {self.key:[]}
+        user_list = list(map(lambda user: SingleUser(user), list(self.participants)))
+        self.context = temp_dict
+        for user in user_list:
+            temp_dict[self.key].append(user.__dict__)
+        logger.debug(temp_dict)
+        return jsonpickle.encode(temp_dict)
 
 
 class CommentsSerializer(BaseSerializer):

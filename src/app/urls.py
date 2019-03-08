@@ -9,6 +9,8 @@ urlpatterns = [
     path('get_events/', get_events),
     path('get_photos_by_event/<uuid:event_id>', get_event_photos),
     path('get_event_comments/<uuid:event_id>', get_event_comments),
+    path('get_event_participants/<uuid:event_id>', get_event_participants),
+    path('get_event_likes/<uuid:event_id>', get_event_likes),
     path('join_event/', join_event),
     path('leave_event/', leave_event),
     path('like_event/', like_event),
