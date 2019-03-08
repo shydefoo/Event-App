@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 
 from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
 from project import settings
+from project.settings import JWT_COOKIE_CLIENT
 from utils.logger_class import EventsAppLogger
 from app.utils.serializers.serializer_classes import EventSerializer, UsersSerializer, CommentsSerializer, \
     PhotoSerializer
@@ -31,7 +32,7 @@ def get_jwt_token(request):
 
 
 @require_http_methods(['GET'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def get_events(request):
     events = list(Event.objects.all())
     event_serializer = EventSerializer(Event, events)
@@ -55,7 +56,7 @@ def get_events(request):
 #     return response
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def join_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
@@ -77,7 +78,7 @@ def join_event(request):
     return JsonResponse(res, safe=False)
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def leave_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
@@ -97,7 +98,7 @@ def leave_event(request):
     return JsonResponse(res, safe=False)
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def like_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
@@ -114,7 +115,7 @@ def like_event(request):
     return JsonResponse(res, safe=False)
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def dislike_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
@@ -136,7 +137,7 @@ def dislike_event(request):
 
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def comment_on_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
@@ -156,7 +157,7 @@ def comment_on_event(request):
     return JsonResponse(res, safe=False)
 
 @require_http_methods(['GET'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def get_event_participants(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     participants = list(event.participants.all())
@@ -165,7 +166,7 @@ def get_event_participants(request, event_id):
 
 
 @require_http_methods(['GET'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def get_event_likes(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     likes = list(event.likes.all())
@@ -174,7 +175,7 @@ def get_event_likes(request, event_id):
 
 
 @require_http_methods(['GET'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def get_event_comments(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     comments = event.comment_set.all()
@@ -185,7 +186,7 @@ def get_event_comments(request, event_id):
 
 
 @require_http_methods(['GET'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def get_event_photos(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
     images = event.photo_set.all()
@@ -195,7 +196,7 @@ def get_event_photos(request, event_id):
 
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def search_events(request):
     card_template = 'client_app/search_card.html'
     search_text = request.POST['search_text']
@@ -215,7 +216,7 @@ def search_events(request):
 
 
 @require_http_methods(['POST'])
-@validate_request(redirect_func)
+@validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def search_events_render(request):
     '''
     Additional endpoint to render html instead of sending json file back

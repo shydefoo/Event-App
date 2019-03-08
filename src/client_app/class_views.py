@@ -9,10 +9,11 @@ from app.utils.custom_auth.jwt_auth_methods import validate_request
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
 from client_app.forms import CommentForm
 from client_app.views import login_fail_redirect, login_success_redirect
+from project.settings import JWT_COOKIE_CLIENT
 from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
-decorator = [validate_request(login_fail_redirect)]
+decorator = [validate_request(login_fail_redirect, JWT_COOKIE_CLIENT)]
 
 
 class UserLoginView(StaffLoginView):
@@ -20,6 +21,7 @@ class UserLoginView(StaffLoginView):
     auth_class = BasicCustomAuthentication
     login_fail_redirection_page = login_fail_redirect
     login_success_redirection_page = login_success_redirect
+    jwt_cookie_name = JWT_COOKIE_CLIENT
 
 @method_decorator(decorator, name='get')
 class UserHomeView(BaseView):

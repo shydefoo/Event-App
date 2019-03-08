@@ -1,7 +1,8 @@
 from django.urls import path
 
 from admin_app.class_views import StaffLoginView, StaffHomeView, StaffEventView, StaffCreateEventView
-from admin_app.views import validator_view, home, login, event_view, create_event_view
+# from admin_app.views import validator_view, home, login, event_view, create_event_view
+from admin_app.views import validator_view
 
 urlpatterns = [
     path('', validator_view, name='validator_view'),

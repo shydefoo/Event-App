@@ -12,10 +12,12 @@ from app.models import Event
 from app.utils.custom_auth.jwt_auth_methods import validate_staff_status, validate_request
 from app.utils.custom_auth.password_handler import BasicStaffCustomAuthentication
 from app.utils.serializers.serializer_response_classes import SingleEventForm
-from project.settings import JWT_COOKIE
+from project.settings import JWT_COOKIE_STAFF
 from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
+
+decorators = [validate_request(login_fail_redirect), validate_staff_status(login_fail_redirect)]
 
 class BaseView(View):
     def build_context(self, *args, **kwargs):
@@ -28,6 +30,7 @@ class StaffLoginView(BaseView):
     cookie_handler_class = CookieHandler
     login_fail_redirection_page = login_fail_redirect
     login_success_redirection_page = login_success_redirect
+    jwt_cookie_name = JWT_COOKIE_STAFF
 
     def get(self, request, *args, **kwargs):
         context = self.build_context(self.form_class())
@@ -42,7 +45,7 @@ class StaffLoginView(BaseView):
             if auth_handler.authenticate():
                 logger.debug('Authentication success')
                 response = self.login_success_redirection_page()
-                self.cookie_handler_class(response, JWT_COOKIE, auth_handler.token, None).set_cookie()
+                self.cookie_handler_class(response, self.jwt_cookie_name, auth_handler.token, None).set_cookie()
                 return response
             else:
                 logger.debug('Authentication failed')
@@ -57,12 +60,12 @@ class StaffLoginView(BaseView):
         }
         return context
 
-
+@method_decorator(decorators, name='get')
 class StaffHomeView(BaseView):
     template_name = 'admin_app/home.html'
 
     @method_decorator(validate_request(login_fail_redirect))
-    @method_decorator(validate_request(login_fail_redirect))
+    @method_decorator(validate_staff_status(login_fail_redirect))
     def get(self, request, *args, **kwargs):
         events = Event.objects.all()
         context = self.build_context(events)
@@ -74,6 +77,8 @@ class StaffHomeView(BaseView):
         }
         return context
 
+@method_decorator(decorators, name='get')
+@method_decorator(decorators, name='post')
 class StaffEventView(BaseView):
     template_name = 'admin_app/event_view.html'
     page_redirection_event_fail = get_event_fail
@@ -83,8 +88,8 @@ class StaffEventView(BaseView):
     event_form_builder = SingleEventForm
 
 
-    @method_decorator(validate_request(login_fail_redirect))
-    @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_staff_status(login_fail_redirect))
     def get(self, request, event_id, *args, **kwargs):
         try:
             event = Event.objects.get(id=event_id)
@@ -98,8 +103,8 @@ class StaffEventView(BaseView):
             logger.debug('error, '+ str(e))
             return self.page_redirection_event_fail()
 
-    @method_decorator(validate_request(login_fail_redirect))
-    @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_staff_status(login_fail_redirect))
     def post(self, request, event_id, *args, **kwargs):
         try:
             event = Event.objects.get(id=event_id)
@@ -130,20 +135,22 @@ class StaffEventView(BaseView):
         return context
 
 
+@method_decorator(decorators, name='get')
+@method_decorator(decorators, name='post')
 class StaffCreateEventView(BaseView):
     template_name = 'admin_app/create_event_view.html'
     form_class = EventForm
     form_invalid_redirection = create_event_fail
     page_redirection_create_event_success = create_event_success
 
-    @method_decorator(validate_request(login_fail_redirect))
-    @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_staff_status(login_fail_redirect))
     def get(self, request, *args, **kwargs):
         event_form = self.form_class()
         return render(request, self.template_name, context=self.build_context(event_form))
 
-    @method_decorator(validate_request(login_fail_redirect))
-    @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_request(login_fail_redirect))
+    # @method_decorator(validate_staff_status(login_fail_redirect))
     def post(self, request, *args, **kwargs):
         event_form = self.form_class(request.POST)
         if event_form.is_valid():
