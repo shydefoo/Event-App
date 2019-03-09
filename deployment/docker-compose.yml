@@ -31,9 +31,9 @@ services:
 
   nginx_service:
     image: nginx:latest
-    restart: always
+#    restart: always
     volumes:
-      - ./webapp.conf:/etc/nginx/conf.d
+      - ./nginx-conf:/etc/nginx/conf.d
       - image_vol:/app/src/Images:ro
       - static_vol:/app/src/static:ro
     ports:
@@ -42,7 +42,7 @@ services:
       - web_app
     networks:
       - webnet
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    command: ["nginx", "-g", "daemon off;"]
 
 networks:
   webnet:
