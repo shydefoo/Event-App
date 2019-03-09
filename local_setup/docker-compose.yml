@@ -14,35 +14,21 @@ services:
       - db_vol:/bitnami/mysql/data
 
   web_app:
-    image: entry-task:v1.5
+    image: entry-task:dev
     env_file:
       - .env
     networks:
       - webnet
     deploy:
       replicas: 1
-#    ports:
-#      - "80:8000"
+    ports:
+      - "80:8000"
     depends_on:
       - db_service
     volumes:
       - image_vol:/app/Images
       - static_vol:/app/src/static
 
-  nginx_service:
-    image: nginx:latest
-    restart: always
-    volumes:
-      - ./webapp.conf:/etc/nginx/conf.d
-      - image_vol:/app/src/Images:ro
-      - static_vol:/app/src/static:ro
-    ports:
-      - "80:80"
-    depends_on:
-      - web_app
-    networks:
-      - webnet
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
 networks:
   webnet:
@@ -51,4 +37,3 @@ volumes:
   db_vol:
   image_vol:
   static_vol:
-
