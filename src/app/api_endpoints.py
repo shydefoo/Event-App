@@ -265,7 +265,7 @@ def create_category(request):
     res = {
         'reply':''
     }
-    if category is not None and not Category.objects.get(category=category):
+    if category is not None and Category.objects.filter(category=category).count() == 0:
         cat = Category(category=category)
         cat.save()
         res['reply'] = 'Sucessfully created category'
