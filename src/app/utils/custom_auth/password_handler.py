@@ -2,7 +2,7 @@ import hashlib, uuid
 
 import jwt
 
-from app.models import UserAccount
+from app.models import UserAccount, UserSaltTable
 from django.shortcuts import get_object_or_404
 
 from project import settings
@@ -23,6 +23,9 @@ class CustomAuthenticationBase:
     def hash_password(self, pw, salt):
         raise NotImplementedError
 
+    @staticmethod
+    def create_new_user(*args, **kwargs):
+        raise NotImplementedError
 
 class BasicCustomAuthentication(CustomAuthenticationBase):
     def __init__(self, pw, username):
@@ -56,6 +59,25 @@ class BasicCustomAuthentication(CustomAuthenticationBase):
         salt = uuid.uuid4().hex
         hashed_password = hashlib.sha512(str(password + salt).encode('utf-8')).hexdigest()
         return hashed_password, salt
+
+    @staticmethod
+    def create_new_user(username, password, is_staff):
+        if username is not None and password is not None:
+            user_count = UserAccount.objects.filter(username=username).count()
+            if user_count > 0:
+                return False
+            if is_staff == 1:
+                is_staff = True
+            hashed_pw, salt = BasicCustomAuthentication.generate_new_password(password)
+            salt = UserSaltTable(salt=salt)
+            salt.save()
+            user = UserAccount(id=uuid.uuid4(), username=username, password=hashed_pw, salt=salt, is_staff=is_staff)
+            user.save()
+            return user
+        else:
+            return False
+
+
 
 class BasicStaffCustomAuthentication(BasicCustomAuthentication):
     def authenticate(self):

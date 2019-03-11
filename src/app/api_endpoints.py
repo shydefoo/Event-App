@@ -247,22 +247,16 @@ def create_user(request):
         'reply':''
     }
     username = request.POST.get('username', None)
-    password = request.POST.get('paassword', None)
+    password = request.POST.get('password', None)
     is_staff = request.POST.get('is_staff', False)
-    if username is not None and password is not None:
-        user = UserAccount.objects.get(username=username)
-        if user is not None:
-           res['reply'] = 'Username already exists'
-           return JsonResponse(res, status=202)
-        if is_staff == 1:
-           is_staff = True
-        hashed_pw, salt = BasicCustomAuthentication.generate_new_password(password)
-        salt = UserSaltTable(salt=salt)
-        salt.save()
-        user= UserAccount(id=uuid.uuid4(), password=hashed_pw, salt=salt, is_staff=is_staff)
-        user.save()
+    user = BasicCustomAuthentication.create_new_user(username, password, is_staff)
+    if user == False:
+        res['reply'] = 'Username already exists'
+        status=202
+    else:
         res['reply'] = 'User account created'
-        return JsonResponse(res, status=200)
+        status=200
+    return JsonResponse(res, status=status)
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func)

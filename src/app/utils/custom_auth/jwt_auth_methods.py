@@ -169,4 +169,4 @@ def generate_token(username, pw):
         logger.debug(token)
         return token
     else:
-        return 'Incorrect credentials'
+        return b'Incorrect credentials'

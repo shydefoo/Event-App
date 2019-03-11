@@ -6,7 +6,7 @@ import json
 class IntegrationTests(unittest.TestCase):
     base_url = 'http://localhost:8000/api/'
     username = 'shide'
-    password = '123'
+    password = '1234qwer'
     set_header = True
 
     def build_header(self):

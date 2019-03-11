@@ -104,12 +104,20 @@ class EventsTests(IntegrationTests):
     def test_create_user(self):
         url = self.base_url + 'create_user/'
         header = self.build_header()
+        new_user = 'new_user'
+        password = 'qwerty'
         data = {
-            'username': 'new_user',
-            'password': 'qwerty',
+            'username': new_user,
+            'password': password,
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.json())
+
+        url2 = self.base_url + 'get_jwt_token/'
+        res = requests.post(url2, data=data)
+        pprint.pprint(res.json())
+
+
 
 
 
