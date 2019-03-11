@@ -65,4 +65,6 @@ class UserEventView(BaseView):
             'like': like,
             'comment_form': comment_form
         }
+
+
         return context

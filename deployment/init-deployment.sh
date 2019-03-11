@@ -13,6 +13,7 @@
 # 4) cd into arg3
 # 5) docker load -i arg2
 # 6) docker stack deploy -c docker-compose.yml arg4
+# Eg. ./init-deployment.sh -t entry-task:v1.9 -f entry-task-v1.9.tar -save /home/ld-sgdev/foosd/entry-task-v1.8 -
 server_ip=ld-foosd@203.116.180.244
 image_tag=entry-task:latest
 tar_file_name=$3
@@ -46,7 +47,7 @@ echo "$save_path"
 echo "$stack_name"
 
 
-if [[ "$(docker image -q ${image_tag} 2> /dev/null)" == "" ]]; then
+if [[ "$(docker images -q ${image_tag} 2> /dev/null)" == "" ]]; then
     echo "Building Docker Image...."
     docker build -t $image_tag ..
     echo "Docker Image built! Image tag: ${image_tag}"
@@ -57,7 +58,6 @@ fi
 echo "Saving Docker image to tar file..."
 docker save $image_tag > $tar_file_name
 echo "Docker image saved to ${tar_file_name}"
-
 echo "Copying deployment folder to ${save_path} at ${server_ip}"
 scp -r $(pwd) $server_ip:$save_path
 ssh $server_ip << EOF

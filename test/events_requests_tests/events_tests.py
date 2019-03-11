@@ -4,7 +4,10 @@ from test.requests_test import IntegrationTests
 import requests
 
 class EventsTests(IntegrationTests):
-    base_url = 'http://localhost:8000/api/'
+    # base_url = 'http://localhost:8000/api/'
+    base_url = 'http://203.116.180.244/api/'
+    username = 'admin'
+    password = '1234qwer'
     event_id = '466b945f-3843-43c2-96fe-45b106c07c5a'
     user_id = 'ccd4e975-9608-412c-acf2-5150caaef1b3'
     def test_get_events(self):
@@ -106,6 +109,7 @@ class EventsTests(IntegrationTests):
         header = self.build_header()
         new_user = 'new_user'
         password = 'qwerty'
+        is_staff = 0
         data = {
             'username': new_user,
             'password': password,
