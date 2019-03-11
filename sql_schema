@@ -1,0 +1,60 @@
+BEGIN;
+--
+-- Create model Category
+--
+CREATE TABLE `app_category` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `category` varchar(50) NOT NULL);
+--
+-- Create model Comment
+--
+CREATE TABLE `app_comment` (`id` char(32) NOT NULL PRIMARY KEY, `comment` varchar(2000) NOT NULL, `datetime` datetime(6) NOT NULL);
+--
+-- Create model Event
+--
+CREATE TABLE `app_event` (`id` char(32) NOT NULL PRIMARY KEY, `date_created` date NOT NULL, `datetime_of_event` datetime(6) NULL, `description` varchar(2000) NOT NULL, `title` varchar(200) NOT NULL, `location` varchar(20) NOT NULL);
+CREATE TABLE `app_event_category` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `event_id` char(32) NOT NULL, `category_id` integer NOT NULL);
+--
+-- Create model Photo
+--
+CREATE TABLE `app_photo` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `image` varchar(100) NOT NULL, `event_id` char(32) NULL);
+--
+-- Create model UserAccount
+--
+CREATE TABLE `app_useraccount` (`id` char(32) NOT NULL PRIMARY KEY, `username` varchar(150) NOT NULL UNIQUE, `password` varchar(128) NOT NULL, `is_staff` bool NOT NULL);
+--
+-- Create model UserSaltTable
+--
+CREATE TABLE `app_usersalttable` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `salt` char(32) NOT NULL);
+--
+-- Add field salt to useraccount
+--
+ALTER TABLE `app_useraccount` ADD COLUMN `salt_id` integer NOT NULL UNIQUE;
+--
+-- Add field likes to event
+--
+CREATE TABLE `app_event_likes` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `event_id` char(32) NOT NULL, `useraccount_id` char(32) NOT NULL);
+--
+-- Add field participants to event
+--
+CREATE TABLE `app_event_participants` (`id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY, `event_id` char(32) NOT NULL, `useraccount_id` char(32) NOT NULL);
+--
+-- Add field event to comment
+--
+ALTER TABLE `app_comment` ADD COLUMN `event_id` char(32) NULL;
+--
+-- Add field user to comment
+--
+ALTER TABLE `app_comment` ADD COLUMN `user_id` char(32) NULL;
+ALTER TABLE `app_event_category` ADD CONSTRAINT `app_event_category_event_id_2215a515_fk_app_event_id` FOREIGN KEY (`event_id`) REFERENCES `app_event` (`id`);
+ALTER TABLE `app_event_category` ADD CONSTRAINT `app_event_category_category_id_d228fd7e_fk_app_category_id` FOREIGN KEY (`category_id`) REFERENCES `app_category` (`id`);
+ALTER TABLE `app_event_category` ADD CONSTRAINT `app_event_category_event_id_category_id_d7f39391_uniq` UNIQUE (`event_id`, `category_id`);
+ALTER TABLE `app_photo` ADD CONSTRAINT `app_photo_event_id_81a224d9_fk_app_event_id` FOREIGN KEY (`event_id`) REFERENCES `app_event` (`id`);
+ALTER TABLE `app_useraccount` ADD CONSTRAINT `app_useraccount_salt_id_264cf37f_fk_app_usersalttable_id` FOREIGN KEY (`salt_id`) REFERENCES `app_usersalttable` (`id`);
+ALTER TABLE `app_event_likes` ADD CONSTRAINT `app_event_likes_event_id_005be5f1_fk_app_event_id` FOREIGN KEY (`event_id`) REFERENCES `app_event` (`id`);
+ALTER TABLE `app_event_likes` ADD CONSTRAINT `app_event_likes_useraccount_id_f2a5b2a9_fk_app_useraccount_id` FOREIGN KEY (`useraccount_id`) REFERENCES `app_useraccount` (`id`);
+ALTER TABLE `app_event_likes` ADD CONSTRAINT `app_event_likes_event_id_useraccount_id_a11f13de_uniq` UNIQUE (`event_id`, `useraccount_id`);
+ALTER TABLE `app_event_participants` ADD CONSTRAINT `app_event_participants_event_id_dedb2f62_fk_app_event_id` FOREIGN KEY (`event_id`) REFERENCES `app_event` (`id`);
+ALTER TABLE `app_event_participants` ADD CONSTRAINT `app_event_participan_useraccount_id_64728399_fk_app_usera` FOREIGN KEY (`useraccount_id`) REFERENCES `app_useraccount` (`id`);
+ALTER TABLE `app_event_participants` ADD CONSTRAINT `app_event_participants_event_id_useraccount_id_0a03f57f_uniq` UNIQUE (`event_id`, `useraccount_id`);
+ALTER TABLE `app_comment` ADD CONSTRAINT `app_comment_event_id_524ec01d_fk_app_event_id` FOREIGN KEY (`event_id`) REFERENCES `app_event` (`id`);
+ALTER TABLE `app_comment` ADD CONSTRAINT `app_comment_user_id_693f46cc_fk_app_useraccount_id` FOREIGN KEY (`user_id`) REFERENCES `app_useraccount` (`id`);
+COMMIT;
