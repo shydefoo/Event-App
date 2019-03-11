@@ -100,3 +100,16 @@ class EventsTests(IntegrationTests):
         header = self.build_header()
         res = requests.get(url, headers=header)
         pprint.pprint(res.json())
+
+    def test_create_user(self):
+        url = self.base_url + 'create_user/'
+        header = self.build_header()
+        data = {
+            'username': 'new_user',
+            'password': 'qwerty',
+        }
+        res = requests.post(url, headers=header, data=data)
+        pprint.pprint(res.json())
+
+
+

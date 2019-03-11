@@ -17,7 +17,9 @@ urlpatterns = [
     path('dislike_event/', dislike_event),
     path('comment_event/', comment_on_event),
     path('search_event/', search_events),
-    path('get_event_photos/<uuid:event_id>', get_event_photos)
+    path('get_event_photos/<uuid:event_id>', get_event_photos),
+    path('create_user/', create_user),
+    path('create_category/', create_category)
 ]
 
 urlpatterns += [

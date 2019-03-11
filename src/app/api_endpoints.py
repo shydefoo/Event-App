@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
 from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
+from app.utils.custom_auth.password_handler import BasicCustomAuthentication
 from project import settings
 from project.settings import JWT_COOKIE_CLIENT
 from utils.logger_class import EventsAppLogger
@@ -238,3 +239,43 @@ def search_events_render(request):
     else:
         return HttpResponse('')
         # return JsonResponse('', safe=False)
+
+@require_http_methods(['POST'])
+@validate_request(redirect_func)
+def create_user(request):
+    res = {
+        'reply':''
+    }
+    username = request.POST.get('username', None)
+    password = request.POST.get('paassword', None)
+    is_staff = request.POST.get('is_staff', False)
+    if username is not None and password is not None:
+        user = UserAccount.objects.get(username=username)
+        if user is not None:
+           res['reply'] = 'Username already exists'
+           return JsonResponse(res, status=202)
+        if is_staff == 1:
+           is_staff = True
+        hashed_pw, salt = BasicCustomAuthentication.generate_new_password(password)
+        salt = UserSaltTable(salt=salt)
+        salt.save()
+        user= UserAccount(id=uuid.uuid4(), password=hashed_pw, salt=salt, is_staff=is_staff)
+        user.save()
+        res['reply'] = 'User account created'
+        return JsonResponse(res, status=200)
+
+@require_http_methods(['POST'])
+@validate_request(redirect_func)
+def create_category(request):
+    category = request.POST.get('category', None)
+    res = {
+        'reply':''
+    }
+    if category is not None and not Category.objects.get(category=category):
+        cat = Category(category=category)
+        cat.save()
+        res['reply'] = 'Sucessfully created category'
+        return JsonResponse(res, status=200)
+    else:
+        res['reply'] = 'Category already exists or invalid request'
+        return JsonResponse(res, status=202)
