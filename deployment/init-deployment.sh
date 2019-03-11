@@ -13,7 +13,7 @@
 # 4) cd into arg3
 # 5) docker load -i arg2
 # 6) docker stack deploy -c docker-compose.yml arg4
-# Eg. ./init-deployment.sh -t entry-task:v1.9 -f entry-task-v1.9.tar -save /home/ld-sgdev/foosd/entry-task-v1.8 -
+# Eg. ./init-deployment.sh -t entry-task:v1.9 -f entry-task-v1.9.tar -save /home/ld-sgdev/foosd/entry-task-v1.9 -stack et
 server_ip=ld-foosd@203.116.180.244
 image_tag=entry-task:latest
 tar_file_name=$3

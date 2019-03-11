@@ -1,7 +1,7 @@
 version: "3.0"
 services:
   db_service:
-    image: bitnami/mysql
+    image: bitnami/mysql:5.7
     env_file:
       - .db.env
 #    ports:
@@ -30,7 +30,7 @@ services:
       - static_vol:/app/src/static
 
   nginx_service:
-    image: nginx:latest
+    image: nginx:1.14
 #    restart: always
     volumes:
       - ./nginx-conf:/etc/nginx/conf.d
