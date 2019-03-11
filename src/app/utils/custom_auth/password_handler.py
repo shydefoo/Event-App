@@ -71,6 +71,8 @@ class BasicCustomAuthentication(CustomAuthenticationBase):
                 return False
             if is_staff == 1:
                 is_staff = True
+            else:
+                is_staff = False
             hashed_pw, salt = BasicCustomAuthentication.generate_new_password(password)
             salt = UserSaltTable(salt=salt)
             salt.save()
