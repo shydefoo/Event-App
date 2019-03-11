@@ -10,6 +10,7 @@ from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
 
+
 class CustomAuthenticationBase:
     key = settings.SECRET_KEY
     hash_algo = settings.HASH_ALGO
@@ -26,6 +27,7 @@ class CustomAuthenticationBase:
     @staticmethod
     def create_new_user(*args, **kwargs):
         raise NotImplementedError
+
 
 class BasicCustomAuthentication(CustomAuthenticationBase):
     def __init__(self, pw, username):
@@ -65,6 +67,7 @@ class BasicCustomAuthentication(CustomAuthenticationBase):
         if username is not None and password is not None:
             user_count = UserAccount.objects.filter(username=username).count()
             if user_count > 0:
+                logger.info("Username already exists")
                 return False
             if is_staff == 1:
                 is_staff = True
@@ -78,7 +81,6 @@ class BasicCustomAuthentication(CustomAuthenticationBase):
             return False
 
 
-
 class BasicStaffCustomAuthentication(BasicCustomAuthentication):
     def authenticate(self):
         user = get_object_or_404(UserAccount, username=self.username)
@@ -90,6 +92,7 @@ class BasicStaffCustomAuthentication(BasicCustomAuthentication):
             return user
         else:
             return None
+
 
 class JWTTokenAuthentication(CustomAuthenticationBase):
     def __init__(self, pw, user_id):

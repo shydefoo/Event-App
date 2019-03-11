@@ -23,6 +23,7 @@ class UserLoginView(StaffLoginView):
     login_success_redirection_page = login_success_redirect
     jwt_cookie_name = JWT_COOKIE_CLIENT
 
+
 @method_decorator(decorator, name='get')
 class UserHomeView(BaseView):
     template_name = 'client_app/home.html'
@@ -36,9 +37,10 @@ class UserHomeView(BaseView):
 
     def build_context(self, events, *args, **kwargs):
         context = {
-            'event_list':events
+            'event_list': events
         }
         return context
+
 
 @method_decorator(decorator, name='get')
 class UserEventView(BaseView):
@@ -54,11 +56,11 @@ class UserEventView(BaseView):
         if request.user in list(event.likes.all()):
             like = 1
         logger.debug('par: {}, like:{}'.format(participate, like))
-        return render(request, self.template_name, context = self.build_context(event, participate, like, comment_form))
+        return render(request, self.template_name, context=self.build_context(event, participate, like, comment_form))
 
     def build_context(self, event, participate, like, comment_form):
         context = {
-            'event':event,
+            'event': event,
             'participate': participate,
             'like': like,
             'comment_form': comment_form

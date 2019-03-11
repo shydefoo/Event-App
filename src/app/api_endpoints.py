@@ -68,8 +68,7 @@ def join_event(request):
     event = get_object_or_404(Event, pk=event_id)
 
     participants = list(event.participants.all())
-    res = {}
-    res['reply'] = ''
+    res = {'reply': ''}
     if user not in participants:
         event.participants.add(user)
         logger.info('{} joined event'.format(user))
@@ -78,13 +77,13 @@ def join_event(request):
         res['reply'] = 'Already joined event'
     return JsonResponse(res, safe=False)
 
+
 @require_http_methods(['POST'])
 @validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def leave_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
-    res = {}
-    res['reply'] = ''
+    res = {'reply': ''}
     if user_id is None:
         user = request.user
     else:
@@ -97,6 +96,7 @@ def leave_event(request):
     else:
         res['reply'] = 'Invalid request'
     return JsonResponse(res, safe=False)
+
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
@@ -111,9 +111,10 @@ def like_event(request):
     event.likes.add(user)
     logger.info('{} liked event'.format(user))
     res = {
-        'reply':'Succesfully liked event'
+        'reply': 'Succesfully liked event'
     }
     return JsonResponse(res, safe=False)
+
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
@@ -121,7 +122,7 @@ def dislike_event(request):
     event_id = request.POST.get('event_id')
     user_id = request.POST.get('user_id', None)
     res = {
-        'reply':''
+        'reply': ''
     }
     if user_id is None:
         user = request.user
@@ -134,7 +135,6 @@ def dislike_event(request):
     else:
         res['reply'] = 'Invalid request'
     return JsonResponse(res, safe=False)
-
 
 
 @require_http_methods(['POST'])
@@ -156,6 +156,7 @@ def comment_on_event(request):
         'reply': 'Successfully commented on event'
     }
     return JsonResponse(res, safe=False)
+
 
 @require_http_methods(['GET'])
 @validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
@@ -240,30 +241,32 @@ def search_events_render(request):
         return HttpResponse('')
         # return JsonResponse('', safe=False)
 
+
 @require_http_methods(['POST'])
 @validate_request(redirect_func)
 def create_user(request):
     res = {
-        'reply':''
+        'reply': ''
     }
     username = request.POST.get('username', None)
     password = request.POST.get('password', None)
     is_staff = request.POST.get('is_staff', False)
     user = BasicCustomAuthentication.create_new_user(username, password, is_staff)
-    if user == False:
+    if not user:
         res['reply'] = 'Username already exists'
-        status=202
+        status = 202
     else:
         res['reply'] = 'User account created'
-        status=200
+        status = 200
     return JsonResponse(res, status=status)
+
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func)
 def create_category(request):
     category = request.POST.get('category', None)
     res = {
-        'reply':''
+        'reply': ''
     }
     if category is not None and Category.objects.filter(category=category).count() == 0:
         cat = Category(category=category)

@@ -15,6 +15,7 @@ key = settings.SECRET_KEY
 
 logger = EventsAppLogger(__name__).logger
 
+
 # class ValidationBaseClass:
 #
 #     def __init__(self):
@@ -106,10 +107,11 @@ def validate_request(redirect_func: callable, cookie_key=JWT_COOKIE_STAFF):
     '''
     Handles request authentication using jwt
     Checks if header contains 'authorization' or request has cookie with key 'jwt'
+    :param cookie_key:
     :param redirect_func:
     :return:
     '''
-    logger.debug('validate requests')
+
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
@@ -138,9 +140,11 @@ def validate_request(redirect_func: callable, cookie_key=JWT_COOKIE_STAFF):
             except Exception as e:
                 logger.error(str(e))
                 return redirect_func(request, *args, **kwargs)
+
         return inner
 
     return decorator
+
 
 def validate_staff_status(redirect_func):
     def decorator(func):
@@ -154,8 +158,11 @@ def validate_staff_status(redirect_func):
             else:
                 logger.debug('non staff')
                 return redirect_func(request, *args, **kwargs)
+
         return inner
+
     return decorator
+
 
 def generate_token(username, pw):
     auth_handler = BasicCustomAuthentication(pw, username)

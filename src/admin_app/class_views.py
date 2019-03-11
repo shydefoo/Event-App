@@ -1,8 +1,6 @@
 import uuid
 
-from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 
@@ -21,9 +19,11 @@ logger = EventsAppLogger(__name__).logger
 
 decorators = [validate_request(login_fail_redirect), validate_staff_status(login_fail_redirect)]
 
+
 class BaseView(View):
     def build_context(self, *args, **kwargs):
         pass
+
 
 class StaffLoginView(BaseView):
     form_class = LoginForm
@@ -62,6 +62,7 @@ class StaffLoginView(BaseView):
         }
         return context
 
+
 @method_decorator(decorators, name='get')
 class StaffHomeView(BaseView):
     template_name = 'admin_app/home.html'
@@ -79,6 +80,7 @@ class StaffHomeView(BaseView):
         }
         return context
 
+
 @method_decorator(decorators, name='get')
 @method_decorator(decorators, name='post')
 class StaffEventView(BaseView):
@@ -88,7 +90,6 @@ class StaffEventView(BaseView):
     form_class_event = EventForm
     form_class_photo = PhotoForm
     event_form_builder = SingleEventForm
-
 
     # @method_decorator(validate_request(login_fail_redirect))
     # @method_decorator(validate_staff_status(login_fail_redirect))
@@ -102,7 +103,7 @@ class StaffEventView(BaseView):
             context = self.build_context(event_id, event_form, photo_form, event_images)
             return render(request, self.template_name, context=context)
         except Exception as e:
-            logger.debug('error, '+ str(e))
+            logger.debug('error, ' + str(e))
             return self.page_redirection_event_fail()
 
     # @method_decorator(validate_request(login_fail_redirect))
@@ -113,7 +114,7 @@ class StaffEventView(BaseView):
             event_form = self.form_class_event(request.POST, instance=event)
             if event_form.is_valid():
                 event_form.save()
-            if request.FILES.get('image',None) != None:
+            if request.FILES.get('image', None) is not None:
                 photo_form = PhotoForm(request.POST, request.FILES)
                 if photo_form.is_valid():
                     photo_form.save(commit=False)
@@ -127,7 +128,7 @@ class StaffEventView(BaseView):
         except Exception as e:
             return self.page_redirection_event_fail()
 
-    def build_context(self,event_id, event_form, photo_form, event_images):
+    def build_context(self, event_id, event_form, photo_form, event_images):
         context = {
             'event_id': event_id,
             'form': event_form,
@@ -168,5 +169,3 @@ class StaffCreateEventView(BaseView):
             'form': event_form
         }
         return context
-
-

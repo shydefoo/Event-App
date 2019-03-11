@@ -46,7 +46,6 @@ class Category(models.Model):
         return self.category
 
 
-
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     date_created = models.DateField(auto_now=True)
@@ -62,10 +61,11 @@ class Event(models.Model):
         return reverse('event_view', kwargs={'event_id': self.id})
 
     def get_user_absolute_url(self):
-        return reverse('client-event-view', kwargs={'event_id':self.id})
+        return reverse('client-event-view', kwargs={'event_id': self.id})
 
     def __str__(self):
         return self.title
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -78,12 +78,9 @@ class Comment(models.Model):
         ordering = ['-datetime']
 
 
-
-
 class Photo(models.Model):
     image = models.ImageField(blank=True)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
-
 
     def __str__(self):
         return self.image.name

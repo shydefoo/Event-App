@@ -8,6 +8,7 @@ from utils.logger_class import EventsAppLogger
 
 logger = EventsAppLogger(__name__).logger
 
+
 def login_fail_redirect(request, *args, **kwargs):
     '''
     performs redirection to login page
@@ -19,6 +20,7 @@ def login_fail_redirect(request, *args, **kwargs):
     logger.debug('redirect login page')
     return HttpResponseRedirect(reverse('login'))
     # return HttpResponse('Error Logging in', status=401)
+
 
 def login_success_redirect(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('home'))
@@ -40,6 +42,8 @@ def validator_view(request):
     else:
         logger.debug('non staff')
         return HttpResponseRedirect(reverse('login'))
+
+
 #
 # @require_http_methods(['GET', 'POST'])
 # def login(request):
@@ -192,11 +196,14 @@ def get_event_fail(request, *args, **kwargs):
     # return HttpResponseRedirect(reverse('home'))
     return HttpResponse('Error')
 
+
 def modify_event_success(request, event_id, *args, **kwargs):
     return HttpResponseRedirect(reverse('event_view', kwargs={'event_id': event_id}))
 
+
 def create_event_success(request, *args, **kwargs):
     return HttpResponseRedirect(reverse('home'))
+
 
 def create_event_fail(request, *args, **kwargs):
     return HttpResponse('Error')

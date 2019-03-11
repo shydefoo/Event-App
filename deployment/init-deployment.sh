@@ -69,6 +69,11 @@ docker load -i $tar_file_name
 
 echo "deploying stack.."
 docker stack deploy -c docker-compose.yml $stack_name
+echo "waiting for stack to be deployed"
+sleep 10s
 docker stack ls
 docker service ls
+./admin-setup-script.sh
 EOF
+echo "App Deployment complete."
+exit 1
