@@ -16,9 +16,7 @@
 # Eg. ./init-deployment.sh -t entry-task:v1.9 -f entry-task-v1.9.tar -save /home/ld-sgdev/foosd/entry-task-v1.9 -stack et
 server_ip=ld-foosd@203.116.180.244
 image_tag=entry-task:latest
-tar_file_name=$3
-save_path=$4
-stack_name=$5
+create_root=0
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -36,6 +34,10 @@ while [ "$1" != "" ]; do
                                 ;;
         -stack | --stack_name)  shift
                                 stack_name=$1
+                                ;;
+        --setup_admin)          shift
+                                create_root=$1
+                                ;;
     esac
     shift
 done
@@ -70,10 +72,18 @@ docker load -i $tar_file_name
 echo "deploying stack.."
 docker stack deploy -c docker-compose.yml $stack_name
 echo "waiting for stack to be deployed"
-sleep 10s
+sleep 20s
 docker stack ls
 docker service ls
-./admin-setup-script.sh
+docker ps
 EOF
 echo "App Deployment complete."
-exit 1
+
+if [[ $create_root -eq 1 ]]; then
+    echo "Setting up admin account"
+    ssh $server_ip << EOF
+    cd $save_path
+    ./admin-setup-script.sh
+EOF
+fi
+

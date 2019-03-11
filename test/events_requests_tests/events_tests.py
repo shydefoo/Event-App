@@ -125,7 +125,7 @@ class EventsTests(IntegrationTests):
         url = self.base_url + 'create_category/'
         header = self.build_header()
         data = {
-            'category': 'Games'
+            'category': 'Sports'
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.json())
