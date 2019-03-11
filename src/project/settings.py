@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 # Build paths inside the src like this: os.path.join(BASE_DIR, ...)
+from project import DB_USER, DB_NAME, DB_PW, DB_HOST, DB_PORT, secret_key, DEBUG_OR_NOT, _HASH_ALGO
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'Images')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
@@ -24,12 +26,12 @@ MEDIA_URL = '/images/'
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=2obbxl!8m6j8xthl6$83wxono15_be!vlssf96qmh!kvv^(&f'
+SECRET_KEY = secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = DEBUG_OR_NOT
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -82,11 +84,11 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'root',
-        'NAME': 'event_app_database',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'USER': DB_USER,
+        'NAME': DB_NAME,
+        'PASSWORD': DB_PW,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
@@ -123,7 +125,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-HASH_ALGO = 'HS256'
+HASH_ALGO = _HASH_ALGO
 JWT_COOKIE_STAFF = 'jwt-staff'
 JWT_COOKIE_CLIENT = 'jwt-client'
 SESSION_COOKIE_DOMAIN = None
