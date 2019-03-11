@@ -14,7 +14,7 @@ services:
       - db_vol:/bitnami/mysql/data
 
   web_app:
-    image: entry-task:v1.5
+    image: ${ENTRY_TASK_IMAGE}
     env_file:
       - .env
     networks:
