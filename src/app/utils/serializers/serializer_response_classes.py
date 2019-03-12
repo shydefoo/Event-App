@@ -1,4 +1,8 @@
+from project.settings import DATE_CUSTOM_FORMAT, TIME_CUSTOM_FORMAT
+
+
 class BaseSingleEntity:
+    datetime_format = '{}, {}'.format(DATE_CUSTOM_FORMAT, TIME_CUSTOM_FORMAT)
     def __init__(self):
         pass
 
@@ -7,7 +11,7 @@ class BaseSingleEntity:
 
 class SingleEvent(BaseSingleEntity):
     def __init__(self, event):
-        self.datetime_of_event = event.datetime_of_event.strftime('%d-%m-%Y, %H%M') if event.datetime_of_event is not None else ''
+        self.datetime_of_event = event.datetime_of_event.strftime(self.datetime_format) if event.datetime_of_event is not None else ''
         self.description = event.description
         self.title = event.title
         self.category = list(map(self.extract_category, list(event.category.all())))
@@ -24,7 +28,7 @@ class SingleEvent(BaseSingleEntity):
 
 class SingleComment(BaseSingleEntity):
     def __init__(self, comment):
-        self.datetime = comment.datetime.strftime('%d-%m-%y, %H%M')
+        self.datetime = comment.datetime.strftime(self.datetime_format)
         self.comment = comment.comment
         self.id = self.extract_id(comment)
         self.username = comment.user.username

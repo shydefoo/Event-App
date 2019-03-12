@@ -10,12 +10,11 @@ from app.utils.custom_auth.password_handler import BasicCustomAuthentication
 from app.utils.serializers.serializer_classes import EventSerializer, UsersSerializer, CommentsSerializer, \
     PhotoSerializer
 from project import settings
-from project.settings import JWT_COOKIE_CLIENT
+from project.settings import JWT_COOKIE_CLIENT, DATE_CUSTOM_FORMAT
 from utils.logger_class import EventsAppLogger
 from .models import *
 
 logger = EventsAppLogger(__name__).logger
-# date_format = DATE_CUSTOM_FORMAT
 
 
 def redirect_func(request, *arsg, **kwargs) -> HttpResponse:
@@ -202,7 +201,7 @@ def get_event_photos(request, event_id):
 def search_events(request):
     def _is_valid_date(input_str):
         try:
-            datetime_obj = datetime.strptime(input_str, '%d-%m-%Y')
+            datetime_obj = datetime.strptime(input_str, DATE_CUSTOM_FORMAT)
             logger.debug(datetime_obj)
             return True
         except ValueError:
@@ -211,7 +210,7 @@ def search_events(request):
     logger.debug('search_text: {}'.format(search_text))
     if search_text is not '':
         if _is_valid_date(search_text):
-            datetime_obj_start = datetime.strptime(search_text, '%d-%m-%Y') - timedelta(days=3)
+            datetime_obj_start = datetime.strptime(search_text, DATE_CUSTOM_FORMAT) - timedelta(days=3)
             datetime_obj_end = datetime_obj_start + timedelta(days=6)
             events = list(Event.objects.filter(Q(datetime_of_event__range=[datetime_obj_start, datetime_obj_end])))
         else:
@@ -239,7 +238,7 @@ def search_events_render(request):
     def _is_valid_date(input_str):
         try:
             logger.debug('validate date')
-            datetime_obj = datetime.datetime.strptime(input_str, '%d-%m-%Y')
+            datetime_obj = datetime.datetime.strptime(input_str, DATE_CUSTOM_FORMAT)
             logger.debug(datetime_obj)
             return True
         except ValueError:
@@ -249,7 +248,7 @@ def search_events_render(request):
     logger.debug('search_text: {}'.format(search_text))
     if search_text is not '':
         if _is_valid_date(search_text):
-            datetime_obj_start = datetime.strptime(search_text, '%d-%m-%Y')
+            datetime_obj_start = datetime.strptime(search_text, DATE_CUSTOM_FORMAT)
             datetime_obj_end = datetime_obj_start + timedelta(days=5)
             events = list(Event.objects.filter(Q(datetime_of_event__range=[datetime_obj_start, datetime_obj_end])))
         else:

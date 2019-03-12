@@ -131,8 +131,8 @@ JWT_COOKIE_CLIENT = 'jwt-client'
 SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_SECURE = False
 
-# DATE_CUSTOM_FORMAT = '%d-%m-%Y'
-# TIME_CUSTOM_FORMAT = '%H%M'
+DATE_CUSTOM_FORMAT = '%d-%m-%Y'
+TIME_CUSTOM_FORMAT = '%H%M'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
