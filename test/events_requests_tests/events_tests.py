@@ -107,7 +107,7 @@ class EventsTests(IntegrationTests):
     def test_create_user(self):
         url = self.base_url + 'create_user/'
         header = self.build_header()
-        new_user = 'new_user'
+        new_user = 'new_user2'
         password = 'qwerty'
         is_staff = 0
         data = {
@@ -125,7 +125,7 @@ class EventsTests(IntegrationTests):
         url = self.base_url + 'create_category/'
         header = self.build_header()
         data = {
-            'category': 'Sports'
+            'category': 'New Cat'
         }
         res = requests.post(url, headers=header, data=data)
         pprint.pprint(res.json())

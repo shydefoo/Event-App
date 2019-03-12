@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
-from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
+from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token, validate_staff_status
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
 from app.utils.serializers.serializer_classes import EventSerializer, UsersSerializer, CommentsSerializer, \
     PhotoSerializer
@@ -271,6 +271,7 @@ def search_events_render(request):
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func)
+@validate_staff_status(redirect_func)
 def create_user(request):
     res = {
         'reply': ''
@@ -290,6 +291,7 @@ def create_user(request):
 
 @require_http_methods(['POST'])
 @validate_request(redirect_func)
+@validate_staff_status(redirect_func)
 def create_category(request):
     category = request.POST.get('category', None)
     res = {
