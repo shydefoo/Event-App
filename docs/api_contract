@@ -1,0 +1,47 @@
+API contract:
+
+/api/get_jwt_token/ -
+type: “POST”
+data: {
+	‘username’: str,
+	‘password’: str,
+}
+
+return: JSON
+{
+	'token': str
+}
+
+
+/api/get_events/
+type: "GET"
+return: JSON
+{'event_list': [
+					{
+						'category': [],
+		                 'datetime_of_event': '19-03-11, 1114',
+		                 'description': 'okay',
+		                 'get_user_absolute_url': '/client/event_view/ff903156-cfc8-4e93-869b-227405624cb0',
+		                 'id': 'ff903156cfc84e93869b227405624cb0',
+		                 'likes': ['4a8294076a3346409818a014feaedc2e'],
+		                 'location': 'Singapore',
+		                 'participants':['4a8294076a3346409818a014feaedc2e'],
+		                 'title': 'Event 1'
+	                 }
+ 				]
+ }
+/api/get_photos/by/event/<uuid:event_id>
+
+/api/get_event_comments/<uuid:event_id>
+type: "GET"
+return: JSON
+{"comments":[
+				{
+					"comment": "This event sounds great!", 
+					"datetime": "11-03-19, ''0316",
+					 "id": "871ae8dff1354713a57b528ee24a5bb6", 
+					 "username": "new_user"
+				}
+			]
+}
+/api/get_event_participants/<uuid:event_id>

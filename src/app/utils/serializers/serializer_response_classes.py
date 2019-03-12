@@ -3,7 +3,7 @@ class BaseSingleEntity:
         pass
 
     def extract_id(self, object):
-        return object.id.hex
+        return str(object.id)
 
 class SingleEvent(BaseSingleEntity):
     def __init__(self, event):
@@ -26,7 +26,7 @@ class SingleComment(BaseSingleEntity):
     def __init__(self, comment):
         self.datetime = comment.datetime.strftime('%d-%m-%y, %H%M')
         self.comment = comment.comment
-        self.id = comment.id.hex
+        self.id = self.extract_id(comment)
         self.username = comment.user.username
 
 
