@@ -17,6 +17,7 @@
 server_ip=ld-foosd@203.116.180.244
 image_tag=entry-task:latest
 create_root=0
+overwrite_stack=0 # rm stack currently used in server and deploy new stack with same name (to re-use docker volumes)
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -35,9 +36,13 @@ while [ "$1" != "" ]; do
         -stack | --stack_name)  shift
                                 stack_name=$1
                                 ;;
+        --overwrite)            shift
+                                overwrite_stack=$1
+                                ;;
         --setup_admin)          shift
                                 create_root=$1
                                 ;;
+
     esac
     shift
 done
@@ -48,6 +53,10 @@ echo "$tar_file_name"
 echo "$save_path"
 echo "$stack_name"
 
+if [[ $overwrite_stack -eq 1 ]]; then
+scp $server_ip << EOF
+docker stack rm ${stack_name}
+EOF
 
 if [[ "$(docker images -q ${image_tag} 2> /dev/null)" == "" ]]; then
     echo "Building Docker Image...."
@@ -62,6 +71,11 @@ docker save $image_tag > $tar_file_name
 echo "Docker image saved to ${tar_file_name}"
 echo "Copying deployment folder to ${save_path} at ${server_ip}"
 scp -r $(pwd) $server_ip:$save_path
+
+
+
+fi
+
 ssh $server_ip << EOF
 cd $save_path
 export ENTRY_TASK_IMAGE=$image_tag
