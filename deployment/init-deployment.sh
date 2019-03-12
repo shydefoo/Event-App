@@ -54,7 +54,7 @@ echo "$save_path"
 echo "$stack_name"
 
 if [[ $overwrite_stack -eq 1 ]]; then
-scp $server_ip << EOF
+ssh $server_ip << EOF
 docker stack rm ${stack_name}
 EOF
 
