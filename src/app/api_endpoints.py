@@ -1,6 +1,5 @@
-from datetime import date
+from datetime import datetime, timedelta
 
-import jwt
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -8,14 +7,15 @@ from django.views.decorators.http import require_http_methods
 
 from app.utils.custom_auth.jwt_auth_methods import validate_request, generate_token
 from app.utils.custom_auth.password_handler import BasicCustomAuthentication
+from app.utils.serializers.serializer_classes import EventSerializer, UsersSerializer, CommentsSerializer, \
+    PhotoSerializer
 from project import settings
 from project.settings import JWT_COOKIE_CLIENT
 from utils.logger_class import EventsAppLogger
-from app.utils.serializers.serializer_classes import EventSerializer, UsersSerializer, CommentsSerializer, \
-    PhotoSerializer
 from .models import *
 
 logger = EventsAppLogger(__name__).logger
+# date_format = DATE_CUSTOM_FORMAT
 
 
 def redirect_func(request, *arsg, **kwargs) -> HttpResponse:
@@ -200,13 +200,24 @@ def get_event_photos(request, event_id):
 @require_http_methods(['POST'])
 @validate_request(redirect_func, cookie_key=JWT_COOKIE_CLIENT)
 def search_events(request):
-    card_template = 'client_app/search_card.html'
+    def _is_valid_date(input_str):
+        try:
+            datetime_obj = datetime.strptime(input_str, '%d-%m-%Y')
+            logger.debug(datetime_obj)
+            return True
+        except ValueError:
+            return False
     search_text = request.POST['search_text']
     logger.debug('search_text: {}'.format(search_text))
     if search_text is not '':
-        events = list(Event.objects.filter(
-            Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(
-                location__icontains=search_text)))
+        if _is_valid_date(search_text):
+            datetime_obj_start = datetime.strptime(search_text, '%d-%m-%Y') - timedelta(days=3)
+            datetime_obj_end = datetime_obj_start + timedelta(days=6)
+            events = list(Event.objects.filter(Q(datetime_of_event__range=[datetime_obj_start, datetime_obj_end])))
+        else:
+            events = list(Event.objects.filter(
+                Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(
+                    location__icontains=search_text)))
         logger.debug(events)
         event_serializer = EventSerializer(Event, events)
         json_string = event_serializer.serialize()
@@ -225,13 +236,27 @@ def search_events_render(request):
     :param request:
     :return:
     '''
+    def _is_valid_date(input_str):
+        try:
+            logger.debug('validate date')
+            datetime_obj = datetime.datetime.strptime(input_str, '%d-%m-%Y')
+            logger.debug(datetime_obj)
+            return True
+        except ValueError:
+            return False
     card_template = 'client_app/search_card.html'
     search_text = request.POST['search_text']
     logger.debug('search_text: {}'.format(search_text))
     if search_text is not '':
-        events = list(Event.objects.filter(
-            Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(
+        if _is_valid_date(search_text):
+            datetime_obj_start = datetime.strptime(search_text, '%d-%m-%Y')
+            datetime_obj_end = datetime_obj_start + timedelta(days=5)
+            events = list(Event.objects.filter(Q(datetime_of_event__range=[datetime_obj_start, datetime_obj_end])))
+        else:
+            events = list(Event.objects.filter(
+                Q(title__icontains=search_text) | Q(category__category__icontains=search_text) | Q(
                 location__icontains=search_text)))
+        # Q(datetime_of_event__range=(start_date, end_date))
         logger.debug(events)
         event_serializer = EventSerializer(Event, events)
         json_string = event_serializer.serialize()
@@ -240,6 +265,9 @@ def search_events_render(request):
     else:
         return HttpResponse('')
         # return JsonResponse('', safe=False)
+
+
+
 
 
 @require_http_methods(['POST'])

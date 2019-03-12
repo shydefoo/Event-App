@@ -7,7 +7,7 @@ class BaseSingleEntity:
 
 class SingleEvent(BaseSingleEntity):
     def __init__(self, event):
-        self.datetime_of_event = event.datetime_of_event.strftime('%d-%m-%y, %H%M') if event.datetime_of_event is not None else ''
+        self.datetime_of_event = event.datetime_of_event.strftime('%d-%m-%Y, %H%M') if event.datetime_of_event is not None else ''
         self.description = event.description
         self.title = event.title
         self.category = list(map(self.extract_category, list(event.category.all())))
