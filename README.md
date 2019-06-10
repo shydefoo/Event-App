@@ -1,6 +1,6 @@
-# Entry Task
+# Event Web App
 
-Yet another assignment, this time as an entry task. This time to build a SPA web app in Django. I didn't have enough time to use React for the frontend, so it was old school html and Js + ajax with Django's templating features.
+Yet another assignment; an entry task. This time to build a SPA web app in Django. I didn't have enough time to use React for the frontend, so it was old school html and Js + ajax with Django's templating features.
 
 ## Requirements
 * Build and event web app in Django WITHOUT using the Django's Admin module, User module or Django Rest Framework
