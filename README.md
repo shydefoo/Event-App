@@ -1,9 +1,11 @@
 # Entry Task
 
+Yet another assignment, this time as an entry task. This time to build a SPA web app in Django. I didn't have enough time to use React for the frontend, so it was old school html and Js + ajax with Django's templating features.
+
 ## Requirements
-* see https://git.garena.com/garenalabs/labs_dev/wikis/python_entry_task
-
-
+* Build and event web app in Django WITHOUT using the Django's Admin module, User module or Django Rest Framework
+* Users should be able to search, join, like and comment on events
+* Admin users should be able to manage events (CRUD), upload images
 
 
 ## SETUP
