@@ -10,7 +10,7 @@ jsonpickle==1.1
 mysqlclient==1.4.2.post1
 Pillow==6.2.0
 pycparser==2.19
-PyJWT==1.7.1
+PyJWT==2.4.0
 pyOpenSSL==19.0.0
 PySocks==1.6.8
 pytz==2018.9
